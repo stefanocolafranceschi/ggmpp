@@ -1,0 +1,17 @@
+./GGMpp -a /ggmdata/DATA/sgx5_hvscan_20210729-0444.root
+./GGMpp -a /ggmdata/DATA/sgx5_hvscan_20210729-0528.root
+./GGMpp -a /ggmdata/DATA/sgx5_hvscan_20210729-0611.root
+./GGMpp -a /ggmdata/DATA/sgx5_hvscan_20210729-0656.root
+./GGMpp -a /ggmdata/DATA/sgx5_hvscan_20210729-0739.root
+./GGMpp -a /ggmdata/DATA/sgx5_hvscan_20210729-0823.root
+./GGMpp -a /ggmdata/DATA/sgx5_hvscan_20210729-0906.root
+./GGMpp -a /ggmdata/DATA/sgx5_hvscan_20210729-0951.root
+./GGMpp -a /ggmdata/DATA/sgx5_hvscan_20210729-1034.root
+./GGMpp -a /ggmdata/DATA/sgx5_hvscan_20210729-1118.root
+./GGMpp -a /ggmdata/DATA/sgx5_hvscan_20210729-1200.root
+./GGMpp -a /ggmdata/DATA/sgx5_hvscan_20210729-1242.root
+./GGMpp -a /ggmdata/DATA/sgx5_hvscan_20210729-1324.root
+./GGMpp -a /ggmdata/DATA/sgx5_hvscan_20210729-1406.root
+./GGMpp -a /ggmdata/DATA/sgx5_hvscan_20210729-1447.root
+./GGMpp -a /ggmdata/DATA/sgx5_hvscan_20210729-1527.root
+./GGMpp -a /ggmdata/DATA/sgx5_hvscan_20210729-1607.root

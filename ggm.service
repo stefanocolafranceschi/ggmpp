@@ -1,0 +1,11 @@
+[Unit]
+Description=ggm
+
+[Service]
+User=tetto
+Group=zh
+Type=simple
+ExecStart=/nfshome0/tetto/ggm++/GGMpp -c /nfshome0/tetto/ggm++/ServiceConfig.ini
+
+[Install]
+WantedBy=multi-user.target

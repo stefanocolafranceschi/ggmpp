@@ -36,20 +36,24 @@ void GGMmail(ReadConf myconfiguration, std::string filel) {
             else {
                 imagesave = filel.replace(filel.find(".root"), sizeof(".root") - 1, "_CH");
             }
- 
-            for (int i = 0; i < MaxCh; i++) {
+
+            if ( (myconfiguration.QuickHisto=="both") || (myconfiguration.QuickHisto=="low") ) {  
+              for (int i = 0; i < MaxCh; i++) {
                 std::stringstream convert;   // stream used for the conversion
                 convert << i;
                 Attachments = Attachments + " -a " + imagesave + convert.str() + "l.pdf ";
                 //Attachments = Attachments + " -a " + imagesave + i + "l.pdf ";
+              }
             }
-            for (int i = 0; i < MaxCh; i++) {
+
+            if ( (myconfiguration.QuickHisto=="both") || (myconfiguration.QuickHisto=="high") ) {
+              for (int i = 0; i < MaxCh; i++) {
                 std::stringstream convert;   // stream used for the conversion
                 convert << i;
                 Attachments = Attachments + " -a " + imagesave + convert.str() + "h.pdf ";
                 //Attachments = Attachments + " -a " + imagesave + i + "h.pdf ";
+              }
             }
-
             std::string command = "echo \"" + text + "\" | mail -s \"" + subject + "\"" + Attachments + myconfiguration.Recipient;
             //std::cout << command << std::endl;
             system(command.c_str());

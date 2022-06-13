@@ -7,8 +7,66 @@ int ReadConf::LoadConfiguration() {
         std::cout << "Can't load " << InputFile <<" \n";
         return 1;
     }
+ 
+    // - Monitoring Variables ----
+    email = reader.Get("monitor", "email", "stefano.colafranceschi@emu.edu");
+
+    temp_bin = reader.GetInteger("monitor", "temp_bin",200);
+    temp_min = reader.GetInteger("monitor", "temp_min",15);
+    temp_max = reader.GetInteger("monitor", "temp_max",25);
+
+    p_bin = reader.GetInteger("monitor", "p_bin",200);
+    p_min = reader.GetInteger("monitor", "p_min",920);
+    p_max = reader.GetInteger("monitor", "p_max",980);
+
+    rh_bin = reader.GetInteger("monitor", "rh_bin",200);
+    rh_min = reader.GetInteger("monitor", "rh_min",-5);
+    rh_max = reader.GetInteger("monitor", "rh_max",65);
+
+    hv_bin = reader.GetInteger("monitor", "hv_bin",200);
+    hv_min = reader.GetInteger("monitor", "hv_min",0);
+    hv_max = reader.GetInteger("monitor", "hv_max",10200);
+
+    histo_bin = reader.GetInteger("monitor", "histo_bin",200);
+    histo_min = reader.GetInteger("monitor", "histo_min",0);
+    histo_max = reader.GetInteger("monitor", "histo_max",10000);
+
+    eff_bin = reader.GetInteger("monitor", "eff_bin",200);
+    eff_min = reader.GetFloat("monitor", "eff_min",0);
+    eff_max = reader.GetFloat("monitor", "eff_max",100);
+
+    chargeMin = reader.GetFloat("monitor", "chargeMin",0.1);
+    chargeMax = reader.GetFloat("monitor", "chargeMax",5);
+
+    charge_bin = reader.GetInteger("monitor", "charge_bin",200);
+    charge_min = reader.GetFloat("monitor", "charge_min",0);
+    charge_max = reader.GetFloat("monitor", "charge_max",250);
+
+    avalanche_bin = reader.GetInteger("monitor", "avalanche_bin",200);
+    avalanche_min = reader.GetInteger("monitor", "avalanche_min",0);
+    avalanche_max = reader.GetInteger("monitor", "avalanche_max",1000);
+
+    streamer_bin = reader.GetInteger("monitor", "streamer_bin",200);
+    streamer_min = reader.GetInteger("monitor", "streamer_min",0);
+    streamer_max = reader.GetInteger("monitor", "streamer_max",1000);
+
+    label_font = reader.GetFloat("monitor", "label_font",0.025);
+    axis_offset = reader.GetFloat("monitor", "axis_offset",0.9);
+    time_bin = reader.GetFloat("monitor", "time_bin",5);
+    label_size = reader.GetFloat("monitor", "label_size",0.03);
+
+    wp_min = reader.GetFloat("monitor", "wp_min",0);
+    wp_max = reader.GetFloat("monitor", "wp_max",1.8);
+  
+    wp_bin = reader.GetInteger("monitor", "wp_bin",200);
+    unixtime_bin = reader.GetInteger("monitor", "unixtime_bin", 100);
+    timeperiod = reader.GetInteger("monitor", "timeperiod", 604800);
+//-----------------------------
+
     SendMail = reader.GetBoolean("daq", "SendMail", false);
     SendROOT = reader.GetBoolean("daq", "SendROOT", true);
+    arduinoEnable = reader.GetBoolean("daq", "arduinoEnable", true);
+    arduinoOffset = reader.GetInteger("daq", "arduinoOffset", 0);
     Recipient = reader.Get("daq", "Recipient", "stefano.colafranceschi@emu.edu");
     VMEcontroller = reader.Get("daq", "VMEcontroller", "V2718");
     info = reader.GetBoolean("verbose", "Info", true);
@@ -20,11 +78,32 @@ int ReadConf::LoadConfiguration() {
     sBoardAddress = reader.Get("daq", "BoardAddress", "0");
     ADCboard = reader.Get("adc", "ADCBoard", "965");
     ExpectedWorkingChannels = reader.GetInteger("adc", "ExpectedWorkingChannels", 16);
+
+    ReferenceGap = reader.GetInteger("adc", "ReferenceGap", 3);
+    gap0 = reader.GetInteger("adc", "gap0", 0);
+    gap1 = reader.GetInteger("adc", "gap1", 1);
+    gap2 = reader.GetInteger("adc", "gap2", 2);
+    gap3 = reader.GetInteger("adc", "gap3", 3);
+    gap4 = reader.GetInteger("adc", "gap4", 4);
+    gap5 = reader.GetInteger("adc", "gap5", 5);
+    gap6 = reader.GetInteger("adc", "gap6", 6);
+    gap7 = reader.GetInteger("adc", "gap7", 7);
+    gap8 = reader.GetInteger("adc", "gap8", 8);
+    gap9 = reader.GetInteger("adc", "gap9", 9);
+    gap10 = reader.GetInteger("adc", "gap10", 10);
+    gap11 = reader.GetInteger("adc", "gap11", 11);
+    gap12 = reader.GetInteger("adc", "gap12", 12);
+    gap13 = reader.GetInteger("adc", "gap13", 13);
+    gap14 = reader.GetInteger("adc", "gap14", 14);
+    gap15 = reader.GetInteger("adc", "gap15", 15);
+
+    IPED = reader.GetInteger("adc", "IPED", 180);
     NotFound = reader.GetInteger("adc", "NotFound", 666);
     multiplereading = reader.GetBoolean("adc", "Multiplereading", false);
     BLTsize = reader.GetInteger("adc", "BLTsize", 256);
     NumberOfRuns = reader.GetInteger("daq", "NumberOfRuns", 1);
     DataFolder = reader.Get("daq", "DataFolder", "/tmp");
+    ChargeADC = reader.Get("adc", "ChargeADC", "Total");
     FileNamePrefix = reader.Get("daq", "FileNamePrefix", "undefined");
     FileNameSuffix = reader.Get("daq", "FileNameSuffix", "");
     hvmode = reader.Get("daq", "HvMode", "config");
@@ -52,12 +131,18 @@ HeaderHexPrint = false;
     PrintConfig = reader.GetBoolean("verbose", "PrintConfig", true);
     PrintDataFile = reader.GetBoolean("verbose", "PrintDataFile", true);
 
-    QuickHisto = reader.GetBoolean("analysis", "QuickHisto", false);
+    QuickHisto = reader.Get("analysis", "QuickHisto", "low");
+    RemovePed = reader.GetBoolean("analysis", "RemovePed", false);
     Fit = reader.GetBoolean("analysis", "Fit", false);
     FitLandauMin = reader.GetInteger("analysis", "FitLandauMin", 500);
+    SpyChannel = reader.GetInteger("analysis","SpyChannel",15);
     FitLandauMax = reader.GetInteger("analysis", "FitLandauMax", 1500);
     FitGausMin = reader.GetInteger("analysis", "FitGausMin", 1500);
     FitGausMax = reader.GetInteger("analysis", "FitGausMax", 4000);
+    FitGausBins = reader.GetInteger("analysis", "FitGausMax", 200);
+    FitLandauBins = reader.GetInteger("analysis", "FitLandauMax", 200);
+    StreamerThreshold = reader.GetInteger("analysis", "StreamerThreshold", 100);
+    AvalancheThreshold = reader.GetInteger("analysis", "AvalancheThreshold", 50);
     HistoFolder = reader.Get("analysis", "HistoFolder", "/nfshome0/tetto/data/temp");
     spychannel = reader.GetInteger("analysis", "SpyChannel", 666);
     FitRange = reader.GetInteger("analysis", "FitRange", 1);
@@ -67,6 +152,38 @@ HeaderHexPrint = false;
     HistoMaxH = reader.GetInteger("analysis", "HistoMaxH", 4095);
     HistoMinL = reader.GetInteger("analysis", "HistoMinL", 0);
     HistoMaxL = reader.GetInteger("analysis", "HistoMaxL", 4095);
+    PedAvg[0] = reader.GetInteger("analysis", "PedAvg0", 0);
+    PedSigma[0] = reader.GetInteger("analysis", "PedSigma0", 0);
+    PedAvg[1] = reader.GetInteger("analysis", "PedAvg1", 0);
+    PedSigma[1] = reader.GetInteger("analysis", "PedSigma1", 0);
+    PedAvg[2] = reader.GetInteger("analysis", "PedAvg2", 0);
+    PedSigma[2] = reader.GetInteger("analysis", "PedSigma2", 0);
+    PedAvg[3] = reader.GetInteger("analysis", "PedAvg3", 0);
+    PedSigma[3] = reader.GetInteger("analysis", "PedSigma3", 0);
+    PedAvg[4] = reader.GetInteger("analysis", "PedAvg4", 0);
+    PedSigma[4] = reader.GetInteger("analysis", "PedSigma4", 0);
+    PedAvg[5] = reader.GetInteger("analysis", "PedAvg5", 0);
+    PedSigma[5] = reader.GetInteger("analysis", "PedSigma5", 0);
+    PedAvg[6] = reader.GetInteger("analysis", "PedAvg6", 0);
+    PedSigma[6] = reader.GetInteger("analysis", "PedSigma6", 0);
+    PedAvg[7] = reader.GetInteger("analysis", "PedAvg7", 0);
+    PedSigma[7] = reader.GetInteger("analysis", "PedSigma7", 0);
+    PedAvg[8] = reader.GetInteger("analysis", "PedAvg8", 0);
+    PedSigma[8] = reader.GetInteger("analysis", "PedSigma8", 0);
+    PedAvg[9] = reader.GetInteger("analysis", "PedAvg9", 0);
+    PedSigma[9] = reader.GetInteger("analysis", "PedSigma9", 0);
+    PedAvg[10] = reader.GetInteger("analysis", "PedAvg10", 0);
+    PedSigma[10] = reader.GetInteger("analysis", "PedSigma10", 0);
+    PedAvg[11] = reader.GetInteger("analysis", "PedAvg11", 0);
+    PedSigma[11] = reader.GetInteger("analysis", "PedSigma11", 0);
+    PedAvg[12] = reader.GetInteger("analysis", "PedAvg12", 0);
+    PedSigma[12] = reader.GetInteger("analysis", "PedSigma12", 0);
+    PedAvg[13] = reader.GetInteger("analysis", "PedAvg13", 0);
+    PedSigma[13] = reader.GetInteger("analysis", "PedSigma13", 0);
+    PedAvg[14] = reader.GetInteger("analysis", "PedAvg14", 0);
+    PedSigma[14] = reader.GetInteger("analysis", "PedSigma14", 0);
+    PedAvg[15] = reader.GetInteger("analysis", "PedAvg15", 0);
+    PedSigma[15] = reader.GetInteger("analysis", "PedSigma15", 0);
 
     rpcmachine = reader.Get("XDAQ", "DCSmachine", "cms_rpc_dcs_1");
     xdaqcommand = reader.Get("XDAQ", "XDAQ_GetScript", "/opt/xdaq/bin/dpGet.sh");

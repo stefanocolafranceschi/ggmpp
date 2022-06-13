@@ -44,7 +44,8 @@ int** PayloadProcess(ReadConf myconfiguration, int BHandle, ulong BoardAddress) 
 
         // if needed, read a new block of data from the board 
         if ((pnt == wcnt) || ((buffer[pnt] & DATATYPE_MASK) == DATATYPE_FILLER)) {
-            CAENVME_FIFOMBLTReadCycle(BHandle, BoardAddress, (char *)buffer, 256, cvA32_U_MBLT, &bcnt);
+            CAENVME_FIFOMBLTReadCycle(BHandle, BoardAddress, (char *)buffer, 256, cvA32_U_MBLT,&bcnt);
+            //CAENVME_BLTReadCycle(BHandle, BoardAddress, (char *)buffer, 256, cvA32_U_DATA, cvD32, &bcnt);
             if ( (myconfiguration.info) && (bcnt>0)) {
                 int b;
                 //printf("Read Data Block: size = %d bytes\n", bcnt);

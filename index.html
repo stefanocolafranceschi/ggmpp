@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>GGM++</title>
+    <script src="http://code.jquery.com/jquery-2.0.3.min.js"></script>
+    <script type="text/javascript">
+
+      $(document).ready(function() {
+
+
+window.setInterval(function(){
+        // READ config file
+          $.post("/read")
+           .done(function(string) {
+            var obj = jQuery.parseJSON(string);
+            $("#Events").val(obj.Events);
+
+            $("#BoardAddress").val(obj.BoardAddress);
+            $("#Board").val(obj.Board);
+            $("#Link").val(obj.Link);
+            $("#DataFolder").val(obj.DataFolder);
+            $("#FileNamePrefix").val(obj.FileNamePrefix);
+            $("#FileNameSuffix").val(obj.FileNameSuffix);
+            $("#Terminal").val(obj.Terminal);
+            $("#RootFile").val(obj.RootFile);
+            $("#NumberOfRuns").val(obj.NumberOfRuns);
+            $("#SpyChannel").val(obj.SpyChannel);
+            $("#monitorFrame").attr("src", "http://localhost:8082/?item=Files/"+obj.CurrentlyRead+"/h1rate&nobrowser&monitoring=100");
+          });
+
+}, 5000);
+
+        $("#generate-string").click(function(e) {
+          $.post("/generator", {
+            "Events": $("input[name='Events']").val(),
+            "BoardAddress": $("input[name='BoardAddress']").val(),
+            "Board": $("input[name='Board']").val(),
+            "Link": $("input[name='Link']").val(),
+            "DataFolder": $("input[name='DataFolder']").val(),
+            "FileNamePrefix": $("input[name='FileNamePrefix']").val(),
+            "FileNameSuffix": $("input[name='FileNameSuffix']").val(),
+            "Terminal": $("input[name='Terminal']").val(),
+            "RootFile": $("input[name='RootFile']").val(),
+            "NumberOfRuns": $("input[name='NumberOfRuns']").val(),
+            "SpyChannel": $("input[name='SpyChannel']").val()})
+           .done(function(string) {
+            $("#the-string").text( string );
+          });
+          e.preventDefault();
+        });
+
+      });
+    </script>
+  </head>
+  <body>
+  Number of events per run <input type="text" value="500" name="Events" id="Events" /><br><br>
+  Physical address set in the board <input type="text" value="EE000000" name="BoardAddress" /><br><br>
+  Board ID <input type="text" value="0" name="Board" id="Board" /><br><br>
+  Board Link<input type="text" value="0" name="Link" id="Link" /><br><br>
+  Folder where to write data (don't forget the final /)<input type="text" value="/home/mario/data/" name="DataFolder" id="DataFolder" size="50"/><br><br>
+  String added on the (eventual) outputfilename<input type="text" value="astra_" name="FileNamePrefix" id="FileNamePrefix" /><br><br>
+  Additional string added on the (eventual) outputfilename<input type="text" value="" name="FileNameSuffix" id="FileNameSuffix" /><br><br>
+  Prints rawdata in the terminal (you can pipe > into txt <input type="text" value="false" name="Terminal" id="Terminal" /><br><br>
+  Writes rawdata into a rootfile with predefined TTree <input type="text" value="true" name="RootFile" id="RootFile" /><br><br>
+  Number of Runs (if zero, it will run forever ;-)<input type="text" value="1" name="NumberOfRuns" id="NumberOfRuns" /><br><br>
+  SpyChannel (this channel is used as pedestal reference)<input type="text" value="2" name="SpyChannel" id="SpyChannel" /><br><br>
+
+    <button id="generate-string">Configure</button>
+    <div id="the-string">
+
+</div>
+
+<h1 style="color: #5e9ca0;">Real-time DAQ</h1>
+<iframe name="monitorFrame" id="monitorFrame" width="700" height="400">
+</iframe>
+
+  </body>
+</html>
