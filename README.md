@@ -5,10 +5,10 @@ GGM++ system
 
 Introduction
 During 2021 the Gas Gain Monitoring (GGM) system has seen a complete software and hardware redesign. The new system, GGM++ replaces the old one improving performance, stability and general reliability.
-The GGM++ is a cosmic ray telescope, based on small 12 RPC detectors whose working point is continuously monitored online. The monitoring is achieved by reading the charge induced by cosmic muons on copper readout pads\cite{Colafranceschi:2010zz}. The muon signal is amplified by RPCs flown with the same gas mixture that is supplying the CMS RPC Muon system. By doing so, any shift in working point measured by the GGM++ can be correlated to a wrong or contamined gas mixture, triggering an alarm to the entire Muon system.
+The GGM++ is a cosmic ray telescope, based on small 12 RPC detectors whose working point is continuously monitored online. The monitoring is achieved by reading the charge induced by cosmic muons on copper readout pads. The muon signal is amplified by RPCs flown with the same gas mixture that is supplying the CMS RPC Muon system. By doing so, any shift in working point measured by the GGM++ can be correlated to a wrong or contamined gas mixture, triggering an alarm to the entire Muon system.
 
 Hardware setup and devices
-Out of the 12 RPC, 4 form the trigger, in a majority system 3/4. The remaining 8 RPCs are organized in 3 sets. One set of (two) RPC detectors flown with fresh gas mixture and two sets of RPC detectors flown with the CMS RPC closed loop gas mixture\cite{Benussi:2010yx}, one set is using the recirculated gas before purifiers and the other set the gas mixture after the purifiers\cite{Benussi:2008vs}. 
+Out of the 12 RPC, 4 form the trigger, in a majority system 3/4. The remaining 8 RPCs are organized in 3 sets. One set of (two) RPC detectors flown with fresh gas mixture and two sets of RPC detectors flown with the CMS RPC closed loop gas mixture, one set is using the recirculated gas before purifiers and the other set the gas mixture after the purifiers. 
 The 8 RPCs are supplied with a CAEN High Voltage system, read by a CAEN V965 charge sensitive ADC, and monitored in terms of gas pressure (in/out), gas temperature (in/out) and ambient conditions. 
 The GGM++ features a new Arduino-based system that interfaces with pressure and temperature sensors. Each RPC gap is equipped with two temperature/pressure sensors at the gas inlet/outlet. Two Arduino MEGA collect all sensors data, transferred via serial line to a new DAQ computer. 
 
