@@ -15,7 +15,7 @@ public:
 
     std::string email, ChargeADC, HistoFolder, Recipient, VMEcontroller, InputFile, DaqMode, hvmode, rpcmachine, XDaqSendCommand, xdaqcommand, psxmachine, sBoardAddress, DataFolder, FileNamePrefix, FileNameSuffix, ADCboard, QuickHisto;
     bool RemovePed, FileNameXDaqHV, SendToPVSS, Fit, SendMail, arduinoEnable, SendROOT, ConfigurationPrint, RawPrint, PayloadHexPrint, HeaderHexPrint, EOBHexPrint, rootfile, PrintDataFile, info, multiplereading, PrintHv, PrintConfig;
-    int FitGausBins,FitLandauBins,AvalancheThreshold, StreamerThreshold, Polarity, NotFound, eventmonitor, Board, Link, spychannel, events, NumberOfRuns, BLTsize, HistoBinningL, HistoBinningH, HistoMinL, HistoMaxL, HistoMinH, HistoMaxH, ExpectedWorkingChannels, DaqEnable, PulserEnable;
+    int FitGausBins,FitLandauBins,AvalancheThreshold, StreamerThreshold, Polarity, NotFound, rateCheck, eventmonitor, Board, Link, spychannel, events, NumberOfRuns, BLTsize, HistoBinningL, HistoBinningH, HistoMinL, HistoMaxL, HistoMinH, HistoMaxH, ExpectedWorkingChannels, DaqEnable, PulserEnable;
     int hv[16], TimeUnit, Start, Pulser, Period, Width, Output, NumberOfPulses, FitRange;
     int PedAvg[16], PedSigma[16], arduinoOffset;
     CVBoardTypes VMEBoard;

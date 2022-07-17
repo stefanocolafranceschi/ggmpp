@@ -1,0 +1,560 @@
+#include <string.h>
+#include <iostream>
+#include <fstream>
+#include "CAENVMElib.h"
+#include "TF1.h"
+#include "TString.h"
+#include "TCanvas.h"
+#include "TFile.h"
+#include "TStyle.h"
+#include "TLegend.h"
+#include <TH2.h>
+#include <TTree.h>
+#include <TBranch.h>
+#include "TROOT.h"
+#include "TApplication.h"
+#include "ReadConf.h"
+
+void PrintUsage(void) {
+        printf("Usage:\n");
+        printf(" -a <name>\n");
+        printf(" -c <name>\n");
+        exit (8);
+}
+
+void PrintHistograms(ReadConf myconfiguration, std::string filel) {
+    TTree* GGMraw;
+
+    if ( filel.find(".raw") > 0 ) {
+        int range, event, counter, unixtime, buffer,charge0, charge1,charge2, charge3, charge4, charge5, charge6, charge7, charge8, charge9, charge10, charge11, charge12, charge13, charge14, charge15;
+
+        GGMraw = new TTree("GGMraw","GGMraw");
+        GGMraw->Branch("event",&event,"event/I");
+        GGMraw->Branch("range",&range,"range/I");
+        GGMraw->Branch("timestamp",&unixtime,"unixtime/L");
+        GGMraw->Branch("channel0",&charge0,"charge0/I");
+        GGMraw->Branch("channel1",&charge1,"charge1/I");
+        GGMraw->Branch("channel2",&charge2,"charge2/I");
+        GGMraw->Branch("channel3",&charge3,"charge3/I");
+        GGMraw->Branch("channel4",&charge4,"charge4/I");
+        GGMraw->Branch("channel5",&charge5,"charge5/I");
+        GGMraw->Branch("channel6",&charge6,"charge6/I");
+        GGMraw->Branch("channel7",&charge7,"charge7/I");
+        GGMraw->Branch("channel8",&charge8,"charge8/I");
+        GGMraw->Branch("channel9",&charge9,"charge9/I");
+        GGMraw->Branch("channel10",&charge10,"charge10/I");
+        GGMraw->Branch("channel11",&charge11,"charge11/I");
+        GGMraw->Branch("channel12",&charge12,"charge12/I");
+        GGMraw->Branch("channel13",&charge13,"charge13/I");
+        GGMraw->Branch("channel14",&charge14,"charge14/I");
+        GGMraw->Branch("channel15",&charge15,"charge15/I");
+
+        std::ifstream myfile (filel);
+        if (myfile.is_open()) {
+            range = 0 ;
+            while (myfile >> event >> counter >> unixtime >> buffer >> charge0 >> charge1>> charge2 >> charge3 >> charge4 >> charge5 >> charge6 >> charge7 >> charge8 >> charge9 >> charge10 >> charge11 >> charge12 >>  charge13 >> charge14 >> charge15) {
+                GGMraw->Fill();
+            }
+            myfile.close();
+        }
+        else std::cout << "Unable to open file";          
+    }
+    else {
+        TFile f(filel.c_str());
+        GGMraw = (TTree*) f.Get("GGMraw");
+    }
+//std::cout<<"aaa"<<std::endl;
+    std::string imagesave;
+    gStyle->SetOptStat(111100);           // Stats added (overflow/underflow)
+    int hv = 0;
+    std::string title;
+    
+    TCanvas *c1 = new TCanvas("c1");
+    TH1F *histotemp = new TH1F("histotemp", "GGM raw", 1, 2, 10800);
+
+    TH1F *h0h = new TH1F("h0h", "GGM raw", myconfiguration.HistoBinningH, myconfiguration.HistoMinH, myconfiguration.HistoMaxH);
+    TH1F *h1h = new TH1F("h1h", "GGM raw", myconfiguration.HistoBinningH, myconfiguration.HistoMinH, myconfiguration.HistoMaxH);
+    TH1F *h2h = new TH1F("h2h", "GGM raw", myconfiguration.HistoBinningH, myconfiguration.HistoMinH, myconfiguration.HistoMaxH);
+    TH1F *h3h = new TH1F("h3h", "GGM raw", myconfiguration.HistoBinningH, myconfiguration.HistoMinH, myconfiguration.HistoMaxH);
+    TH1F *h4h = new TH1F("h4h", "GGM raw", myconfiguration.HistoBinningH, myconfiguration.HistoMinH, myconfiguration.HistoMaxH);
+    TH1F *h5h = new TH1F("h5h", "GGM raw", myconfiguration.HistoBinningH, myconfiguration.HistoMinH, myconfiguration.HistoMaxH);
+    TH1F *h6h = new TH1F("h6h", "GGM raw", myconfiguration.HistoBinningH, myconfiguration.HistoMinH, myconfiguration.HistoMaxH);
+    TH1F *h7h = new TH1F("h7h", "GGM raw", myconfiguration.HistoBinningH, myconfiguration.HistoMinH, myconfiguration.HistoMaxH);
+    TH1F *h8h = new TH1F("h8h", "GGM raw", myconfiguration.HistoBinningH, myconfiguration.HistoMinH, myconfiguration.HistoMaxH);
+    TH1F *h9h = new TH1F("h9h", "GGM raw", myconfiguration.HistoBinningH, myconfiguration.HistoMinH, myconfiguration.HistoMaxH);
+    TH1F *h10h = new TH1F("h10h", "GGM raw", myconfiguration.HistoBinningH, myconfiguration.HistoMinH, myconfiguration.HistoMaxH);
+    TH1F *h11h = new TH1F("h11h", "GGM raw", myconfiguration.HistoBinningH, myconfiguration.HistoMinH, myconfiguration.HistoMaxH);
+    TH1F *h12h = new TH1F("h12h", "GGM raw", myconfiguration.HistoBinningH, myconfiguration.HistoMinH, myconfiguration.HistoMaxH);
+    TH1F *h13h = new TH1F("h13h", "GGM raw", myconfiguration.HistoBinningH, myconfiguration.HistoMinH, myconfiguration.HistoMaxH);
+    TH1F *h14h = new TH1F("h14h", "GGM raw", myconfiguration.HistoBinningH, myconfiguration.HistoMinH, myconfiguration.HistoMaxH);
+    TH1F *h15h = new TH1F("h15h", "GGM raw", myconfiguration.HistoBinningH, myconfiguration.HistoMinH, myconfiguration.HistoMaxH);
+
+    TH1F *h0l = new TH1F("h0l", "GGM raw", myconfiguration.HistoBinningL, myconfiguration.HistoMinL, myconfiguration.HistoMaxL);
+    TH1F *h1l = new TH1F("h1l", "GGM raw", myconfiguration.HistoBinningL, myconfiguration.HistoMinL, myconfiguration.HistoMaxL);
+    TH1F *h2l = new TH1F("h2l", "GGM raw", myconfiguration.HistoBinningL, myconfiguration.HistoMinL, myconfiguration.HistoMaxL);
+    TH1F *h3l = new TH1F("h3l", "GGM raw", myconfiguration.HistoBinningL, myconfiguration.HistoMinL, myconfiguration.HistoMaxL);
+    TH1F *h4l = new TH1F("h4l", "GGM raw", myconfiguration.HistoBinningL, myconfiguration.HistoMinL, myconfiguration.HistoMaxL);
+    TH1F *h5l = new TH1F("h5l", "GGM raw", myconfiguration.HistoBinningL, myconfiguration.HistoMinL, myconfiguration.HistoMaxL);
+    TH1F *h6l = new TH1F("h6l", "GGM raw", myconfiguration.HistoBinningL, myconfiguration.HistoMinL, myconfiguration.HistoMaxL);
+    TH1F *h7l = new TH1F("h7l", "GGM raw", myconfiguration.HistoBinningL, myconfiguration.HistoMinL, myconfiguration.HistoMaxL);
+    TH1F *h8l = new TH1F("h8l", "GGM raw", myconfiguration.HistoBinningL, myconfiguration.HistoMinL, myconfiguration.HistoMaxL);
+    TH1F *h9l = new TH1F("h9l", "GGM raw", myconfiguration.HistoBinningL, myconfiguration.HistoMinL, myconfiguration.HistoMaxL);
+    TH1F *h10l = new TH1F("h10l", "GGM raw", myconfiguration.HistoBinningL, myconfiguration.HistoMinL, myconfiguration.HistoMaxL);
+    TH1F *h11l = new TH1F("h11l", "GGM raw", myconfiguration.HistoBinningL, myconfiguration.HistoMinL, myconfiguration.HistoMaxL);
+    TH1F *h12l = new TH1F("h12l", "GGM raw", myconfiguration.HistoBinningL, myconfiguration.HistoMinL, myconfiguration.HistoMaxL);
+    TH1F *h13l = new TH1F("h13l", "GGM raw", myconfiguration.HistoBinningL, myconfiguration.HistoMinL, myconfiguration.HistoMaxL);
+    TH1F *h14l = new TH1F("h14l", "GGM raw", myconfiguration.HistoBinningL, myconfiguration.HistoMinL, myconfiguration.HistoMaxL);
+    TH1F *h15l = new TH1F("h15l", "GGM raw", myconfiguration.HistoBinningL, myconfiguration.HistoMinL, myconfiguration.HistoMaxL);
+
+    GGMraw->Draw("channel0>>h0l","range==0");
+    GGMraw->Draw("channel1>>h1l","range==0");
+    GGMraw->Draw("channel2>>h2l","range==0");
+    GGMraw->Draw("channel3>>h3l","range==0");
+    GGMraw->Draw("channel4>>h4l","range==0");
+    GGMraw->Draw("channel5>>h5l","range==0");
+    GGMraw->Draw("channel6>>h6l","range==0");
+    GGMraw->Draw("channel7>>h7l","range==0");
+    GGMraw->Draw("channel8>>h8l","range==0");
+    GGMraw->Draw("channel9>>h9l","range==0");
+    GGMraw->Draw("channel10>>h10l","range==0");
+    GGMraw->Draw("channel11>>h11l","range==0");
+    GGMraw->Draw("channel12>>h12l","range==0");
+    GGMraw->Draw("channel13>>h13l","range==0");
+    GGMraw->Draw("channel14>>h14l","range==0");
+    GGMraw->Draw("channel15>>h15l","range==0");
+    GGMraw->Draw("channel0>>h0h","range==1");
+    GGMraw->Draw("channel1>>h1h","range==1");
+    GGMraw->Draw("channel2>>h2h","range==1");
+    GGMraw->Draw("channel3>>h3h","range==1");
+    GGMraw->Draw("channel4>>h4h","range==1");
+    GGMraw->Draw("channel5>>h5h","range==1");
+    GGMraw->Draw("channel6>>h6h","range==1");
+    GGMraw->Draw("channel7>>h7h","range==1");
+    GGMraw->Draw("channel8>>h8h","range==1");
+    GGMraw->Draw("channel9>>h9h","range==1");
+    GGMraw->Draw("channel10>>h10h","range==1");
+    GGMraw->Draw("channel11>>h11h","range==1");
+    GGMraw->Draw("channel12>>h12h","range==1");
+    GGMraw->Draw("channel13>>h13h","range==1");
+    GGMraw->Draw("channel14>>h14h","range==1");
+    GGMraw->Draw("channel15>>h15h","range==1");
+//imagesave = filel.replace(filel.find(".root"), sizeof(".root") - 1, "_CH0h.pdf");
+//std::cout<<imagesave<<std::endl;
+//filel.replace(filel.find(".root"), sizeof(".root") - 1, "_CH0h.pdf");
+
+    if (GGMraw->GetListOfBranches()->Contains("channel0hv")) {
+        GGMraw->Draw("channel0hv>>histotemp");
+        hv = histotemp->GetMean();
+    }
+
+    title = "GGM CH0 high-range ";
+    if (hv>1) title = title + "(HV=" + std::to_string( hv ) + "V)";
+
+    if ( filel.find(".raw") == std::string::npos ) {
+//        imagesave = filel.replace(filel.find(".raw"), sizeof(".raw") - 1, "_CH0h.pdf");
+    }
+    else {
+  //   imagesave = filel.replace(filel.find(".root"), sizeof(".root") - 1, "_CH0h.pdf");
+}    
+    h0h->SetTitle(title.c_str());
+    h0h->Draw();
+    c1->Print(imagesave.c_str());
+std::cout<<"iiiiaaa"<<std::endl;
+
+    if (GGMraw->GetListOfBranches()->Contains("channel1hv")) {
+        GGMraw->Draw("channel1hv>>histotemp");
+        hv = histotemp->GetMean();
+    }
+    title = "GGM CH1 high-range ";
+    if (hv>1) title = title + "(HV=" + std::to_string( hv ) + "V)";
+    imagesave = filel.replace(filel.find("_CH0h.pdf"), sizeof("_CH0h.pdf") - 1, "_CH1h.pdf");
+    h1h->SetTitle(title.c_str());
+    h1h->Draw();
+    c1->Print(imagesave.c_str());
+
+    if (GGMraw->GetListOfBranches()->Contains("channel2hv")) {
+        GGMraw->Draw("channel2hv>>histotemp");
+        hv = histotemp->GetMean();
+    }
+std::cout<<"llaaa"<<std::endl;
+    title = "GGM CH2 high-range ";
+    if (hv>1) title = title + "(HV=" + std::to_string( hv ) + "V)";
+    imagesave = filel.replace(filel.find("_CH1h.pdf"), sizeof("_CH1h.pdf") - 1, "_CH2h.pdf");
+    h2h->SetTitle(title.c_str());
+    h2h->Draw();
+    c1->Print(imagesave.c_str());
+std::cout<<"uaaa"<<std::endl;
+    if (GGMraw->GetListOfBranches()->Contains("channel3hv")) {
+        GGMraw->Draw("channel3hv>>histotemp");
+        hv = histotemp->GetMean();
+    }
+    title = "GGM CH3 high-range ";
+    if (hv>1) title = title + "(HV=" + std::to_string( hv ) + "V)";
+    imagesave = filel.replace(filel.find("_CH2h.pdf"), sizeof("_CH2h.pdf") - 1, "_CH3h.pdf");
+    h3h->SetTitle(title.c_str());
+    h3h->Draw();
+    c1->Print(imagesave.c_str());
+std::cout<<"zaaa"<<std::endl;
+    if (GGMraw->GetListOfBranches()->Contains("channel4hv")) {
+        GGMraw->Draw("channel4hv>>histotemp");
+        hv = histotemp->GetMean();
+    }
+    title = "GGM CH4 high-range ";
+    if (hv>1) title = title + "(HV=" + std::to_string( hv ) + "V)";
+    imagesave = filel.replace(filel.find("_CH3h.pdf"), sizeof("_CH3h.pdf") - 1, "_CH4h.pdf");
+    h4h->SetTitle(title.c_str());
+    h4h->Draw();
+    c1->Print(imagesave.c_str());
+
+    if (GGMraw->GetListOfBranches()->Contains("channel5hv")) {
+        GGMraw->Draw("channel5hv>>histotemp");
+        hv = histotemp->GetMean();
+    }
+    title = "GGM CH5 high-range ";
+    if (hv>1) title = title + "(HV=" + std::to_string( hv ) + "V)";
+    imagesave = filel.replace(filel.find("_CH4h.pdf"), sizeof("_CH4h.pdf") - 1, "_CH5h.pdf");
+    h5h->SetTitle(title.c_str());
+    h5h->Draw();
+    c1->Print(imagesave.c_str());
+
+    if (GGMraw->GetListOfBranches()->Contains("channel6hv")) {
+        GGMraw->Draw("channel6hv>>histotemp");
+        hv = histotemp->GetMean();
+    }
+
+    title = "GGM CH6 high-range ";
+    if (hv>1) title = title + "(HV=" + std::to_string( hv ) + "V)";
+    imagesave = filel.replace(filel.find("_CH5h.pdf"), sizeof("_CH5h.pdf") - 1, "_CH6h.pdf");
+    h6h->SetTitle(title.c_str());
+    h6h->Draw();
+    c1->Print(imagesave.c_str());
+
+    if (GGMraw->GetListOfBranches()->Contains("channel7hv")) {
+        GGMraw->Draw("channel7hv>>histotemp");
+        hv = histotemp->GetMean();
+    }
+    title = "GGM CH7 high-range ";
+    if (hv>1) title = title + "(HV=" + std::to_string( hv ) + "V)";
+    imagesave = filel.replace(filel.find("_CH6h.pdf"), sizeof("_CH6h.pdf") - 1, "_CH7h.pdf");
+    h7h->SetTitle(title.c_str());
+    h7h->Draw();
+    c1->Print(imagesave.c_str());
+
+    if (GGMraw->GetListOfBranches()->Contains("channel8hv")) {
+        GGMraw->Draw("channel8hv>>histotemp");
+        hv = histotemp->GetMean();
+    }
+    title = "GGM CH8 high-range ";
+    if (hv>1) title = title + "(HV=" + std::to_string( hv ) + "V)";
+    imagesave = filel.replace(filel.find("_CH7h.pdf"), sizeof("_CH7h.pdf") - 1, "_CH8h.pdf");
+    h8h->SetTitle(title.c_str());
+    h8h->Draw();
+    c1->Print(imagesave.c_str());
+
+    if (GGMraw->GetListOfBranches()->Contains("channel9hv")) {
+        GGMraw->Draw("channel9hv>>histotemp");
+        hv = histotemp->GetMean();
+    }
+    title = "GGM CH9 high-range ";
+    if (hv>1) title = title + "(HV=" + std::to_string( hv ) + "V)";
+    imagesave = filel.replace(filel.find("_CH8h.pdf"), sizeof("_CH8h.pdf") - 1, "_CH9h.pdf");
+    h9h->SetTitle(title.c_str());
+    h9h->Draw();
+    c1->Print(imagesave.c_str());
+
+    if (GGMraw->GetListOfBranches()->Contains("channel10hv")) {
+        GGMraw->Draw("channel10hv>>histotemp");
+        hv = histotemp->GetMean();
+    }
+    title = "GGM CH10 high-range ";
+    if (hv>1) title = title + "(HV=" + std::to_string( hv ) + "V)";
+    imagesave = filel.replace(filel.find("_CH9h.pdf"), sizeof("_CH9h.pdf") - 1, "_CH10h.pdf");
+    h10h->SetTitle(title.c_str());
+    h10h->Draw();
+    c1->Print(imagesave.c_str());
+
+    if (GGMraw->GetListOfBranches()->Contains("channel11hv")) {
+        GGMraw->Draw("channel11hv>>histotemp");
+        hv = histotemp->GetMean();
+    }
+    title = "GGM CH11 high-range ";
+    if (hv>1) title = title + "(HV=" + std::to_string( hv ) + "V)";
+    imagesave = filel.replace(filel.find("_CH10h.pdf"), sizeof("_CH10h.pdf") - 1, "_CH11h.pdf");
+    h11h->SetTitle(title.c_str());
+    h11h->Draw();
+    c1->Print(imagesave.c_str());
+
+    if (GGMraw->GetListOfBranches()->Contains("channel12hv")) {
+        GGMraw->Draw("channel12hv>>histotemp");
+        hv = histotemp->GetMean();
+    }
+    title = "GGM CH12 high-range ";
+    if (hv>1) title = title + "(HV=" + std::to_string( hv ) + "V)";
+    imagesave = filel.replace(filel.find("_CH11h.pdf"), sizeof("_CH11h.pdf") - 1, "_CH12h.pdf");
+    h12h->SetTitle(title.c_str());
+    h12h->Draw();
+    c1->Print(imagesave.c_str());
+
+    if (GGMraw->GetListOfBranches()->Contains("channel13hv")) {
+        GGMraw->Draw("channel13hv>>histotemp");
+        hv = histotemp->GetMean();
+    }
+    title = "GGM CH13 high-range ";
+    if (hv>1) title = title + "(HV=" + std::to_string( hv ) + "V)";
+    imagesave = filel.replace(filel.find("_CH12h.pdf"), sizeof("_CH12h.pdf") - 1, "_CH13h.pdf");
+    h13h->SetTitle(title.c_str());
+    h13h->Draw();
+    c1->Print(imagesave.c_str());
+
+    if (GGMraw->GetListOfBranches()->Contains("channel14hv")) {
+        GGMraw->Draw("channel14hv>>histotemp");
+        hv = histotemp->GetMean();
+    }
+    title = "GGM CH14 high-range ";
+    if (hv>1) title = title + "(HV=" + std::to_string( hv ) + "V)";
+    imagesave = filel.replace(filel.find("_CH13h.pdf"), sizeof("_CH13h.pdf") - 1, "_CH14h.pdf");
+    h14h->SetTitle(title.c_str());
+    h14h->Draw();
+    c1->Print(imagesave.c_str());
+
+    if (GGMraw->GetListOfBranches()->Contains("channel15hv")) {
+        GGMraw->Draw("channel15hv>>histotemp");
+        hv = histotemp->GetMean();
+    }
+    title = "GGM CH15 high-range ";
+    if (hv>1) title = title + "(HV=" + std::to_string( hv ) + "V)";
+    imagesave = filel.replace(filel.find("_CH14h.pdf"), sizeof("_CH14h.pdf") - 1, "_CH15h.pdf");
+    h15h->SetTitle(title.c_str());
+    h15h->Draw();
+    c1->Print(imagesave.c_str());
+
+    if (GGMraw->GetListOfBranches()->Contains("channel0hv")) {
+        GGMraw->Draw("channel0hv>>histotemp");
+        hv = histotemp->GetMean();
+    }
+    title = "GGM CH0 low-range ";
+    if (hv>1) title = title + "(HV=" + std::to_string( hv ) + "V)";
+    imagesave = filel.replace(filel.find("_CH15h.pdf"), sizeof("_CH15h.pdf") - 1, "_CH0l.pdf");
+    h0l->SetTitle(title.c_str());
+    h0l->Draw();
+    c1->Print(imagesave.c_str());
+
+    if (GGMraw->GetListOfBranches()->Contains("channel1hv")) {
+        GGMraw->Draw("channel1hv>>histotemp");
+        hv = histotemp->GetMean();
+    }
+    title = "GGM CH1 low-range ";
+    if (hv>1) title = title + "(HV=" + std::to_string( hv ) + "V)";
+    imagesave = filel.replace(filel.find("_CH0l.pdf"), sizeof("_CH0l.pdf") - 1, "_CH1l.pdf");
+    h1l->SetTitle(title.c_str());
+    h1l->Draw();
+    c1->Print(imagesave.c_str());
+
+    if (GGMraw->GetListOfBranches()->Contains("channel2hv")) {
+        GGMraw->Draw("channel2hv>>histotemp");
+        hv = histotemp->GetMean();
+    }
+    title = "GGM CH2 low-range ";
+    if (hv>1) title = title + "(HV=" + std::to_string( hv ) + "V)";
+    imagesave = filel.replace(filel.find("_CH1l.pdf"), sizeof("_CH1l.pdf") - 1, "_CH2l.pdf");
+    h2l->SetTitle(title.c_str());
+    h2l->Draw();
+    c1->Print(imagesave.c_str());
+
+    if (GGMraw->GetListOfBranches()->Contains("channel3hv")) {
+        GGMraw->Draw("channel3hv>>histotemp");
+        hv = histotemp->GetMean();
+    }
+    title = "GGM CH3 low-range ";
+    if (hv>1) title = title + "(HV=" + std::to_string( hv ) + "V)";
+    imagesave = filel.replace(filel.find("_CH2l.pdf"), sizeof("_CH2l.pdf") - 1, "_CH3l.pdf");
+    h3l->SetTitle(title.c_str());
+    h3l->Draw();
+    c1->Print(imagesave.c_str());
+
+    if (GGMraw->GetListOfBranches()->Contains("channel4hv")) {
+        GGMraw->Draw("channel4hv>>histotemp");
+        hv = histotemp->GetMean();
+    }
+    title = "GGM CH4 low-range ";
+    if (hv>1) title = title + "(HV=" + std::to_string( hv ) + "V)";
+    imagesave = filel.replace(filel.find("_CH3l.pdf"), sizeof("_CH3l.pdf") - 1, "_CH4l.pdf");
+    h4l->SetTitle(title.c_str());
+    h4l->Draw();
+    c1->Print(imagesave.c_str());
+
+    if (GGMraw->GetListOfBranches()->Contains("channel5hv")) {
+        GGMraw->Draw("channel5hv>>histotemp");
+        hv = histotemp->GetMean();
+    }
+    title = "GGM CH5 low-range ";
+    if (hv>1) title = title + "(HV=" + std::to_string( hv ) + "V)";
+    imagesave = filel.replace(filel.find("_CH4l.pdf"), sizeof("_CH4l.pdf") - 1, "_CH5l.pdf");
+    h5l->SetTitle(title.c_str());
+    h5l->Draw();
+    c1->Print(imagesave.c_str());
+
+    if (GGMraw->GetListOfBranches()->Contains("channel6hv")) {
+        GGMraw->Draw("channel6hv>>histotemp");
+        hv = histotemp->GetMean();
+    }
+    title = "GGM CH6 low-range ";
+    if (hv>1) title = title + "(HV=" + std::to_string( hv ) + "V)";
+    imagesave = filel.replace(filel.find("_CH5l.pdf"), sizeof("_CH5l.pdf") - 1, "_CH6l.pdf");
+    h6l->SetTitle(title.c_str());
+    h6l->Draw();
+    c1->Print(imagesave.c_str());
+
+    if (GGMraw->GetListOfBranches()->Contains("channel7hv")) {
+        GGMraw->Draw("channel7hv>>histotemp");
+        hv = histotemp->GetMean();
+    }
+    title = "GGM CH7 low-range ";
+    if (hv>1) title = title + "(HV=" + std::to_string( hv ) + "V)";
+    imagesave = filel.replace(filel.find("_CH6l.pdf"), sizeof("_CH6l.pdf") - 1, "_CH7l.pdf");
+    h7l->SetTitle(title.c_str());
+    h7l->Draw();
+    c1->Print(imagesave.c_str());
+
+    if (GGMraw->GetListOfBranches()->Contains("channel8hv")) {
+        GGMraw->Draw("channel8hv>>histotemp");
+        hv = histotemp->GetMean();
+    }
+    title = "GGM CH8 low-range ";
+    if (hv>1) title = title + "(HV=" + std::to_string( hv ) + "V)";
+    imagesave = filel.replace(filel.find("_CH7l.pdf"), sizeof("_CH7l.pdf") - 1, "_CH8l.pdf");
+    h8l->SetTitle(title.c_str());
+    h8l->Draw();
+    c1->Print(imagesave.c_str());
+
+    if (GGMraw->GetListOfBranches()->Contains("channel9hv")) {
+        GGMraw->Draw("channel9hv>>histotemp");
+        hv = histotemp->GetMean();
+    }
+    title = "GGM CH9 low-range ";
+    if (hv>1) title = title + "(HV=" + std::to_string( hv ) + "V)";
+    imagesave = filel.replace(filel.find("_CH8l.pdf"), sizeof("_CH8l.pdf") - 1, "_CH9l.pdf");
+    h9l->SetTitle(title.c_str());
+    h9l->Draw();
+    c1->Print(imagesave.c_str());
+
+    if (GGMraw->GetListOfBranches()->Contains("channel10hv")) {
+        GGMraw->Draw("channel10hv>>histotemp");
+        hv = histotemp->GetMean();
+    }
+    title = "GGM CH10 low-range ";
+    if (hv>1) title = title + "(HV=" + std::to_string( hv ) + "V)";
+    imagesave = filel.replace(filel.find("_CH9l.pdf"), sizeof("_CH9l.pdf") - 1, "_CH10l.pdf");
+    h10l->SetTitle(title.c_str());
+    h10l->Draw();
+    c1->Print(imagesave.c_str());
+
+    if (GGMraw->GetListOfBranches()->Contains("channel11hv")) {
+        GGMraw->Draw("channel11hv>>histotemp");
+        hv = histotemp->GetMean();
+    }
+    title = "GGM CH11 low-range ";
+    if (hv>1) title = title + "(HV=" + std::to_string( hv ) + "V)";
+    imagesave = filel.replace(filel.find("_CH10l.pdf"), sizeof("_CH10l.pdf") - 1, "_CH11l.pdf");
+    h11l->SetTitle(title.c_str());
+    h11l->Draw();
+    c1->Print(imagesave.c_str());
+
+    if (GGMraw->GetListOfBranches()->Contains("channel12hv")) {
+        GGMraw->Draw("channel12hv>>histotemp");
+        hv = histotemp->GetMean();
+    }
+    title = "GGM CH12 low-range ";
+    if (hv>1) title = title + "(HV=" + std::to_string( hv ) + "V)";
+    imagesave = filel.replace(filel.find("_CH11l.pdf"), sizeof("_CH11l.pdf") - 1, "_CH12l.pdf");
+    h12l->SetTitle(title.c_str());
+    h12l->Draw();
+    c1->Print(imagesave.c_str());
+
+    if (GGMraw->GetListOfBranches()->Contains("channel13hv")) {
+        GGMraw->Draw("channel13hv>>histotemp");
+        hv = histotemp->GetMean();
+    }
+    title = "GGM CH13 low-range ";
+    if (hv>1) title = title + "(HV=" + std::to_string( hv ) + "V)";
+    imagesave = filel.replace(filel.find("_CH12l.pdf"), sizeof("_CH12l.pdf") - 1, "_CH13l.pdf");
+    h13l->SetTitle(title.c_str());
+    h13l->Draw();
+    c1->Print(imagesave.c_str());
+
+    if (GGMraw->GetListOfBranches()->Contains("channel14hv")) {
+        GGMraw->Draw("channel14hv>>histotemp");
+        hv = histotemp->GetMean();
+    }
+    title = "GGM CH14 low-range ";
+    if (hv>1) title = title + "(HV=" + std::to_string( hv ) + "V)";
+    imagesave = filel.replace(filel.find("_CH13l.pdf"), sizeof("_CH13l.pdf") - 1, "_CH14l.pdf");
+    h14l->SetTitle(title.c_str());
+    h14l->Draw();
+    c1->Print(imagesave.c_str());
+
+    if (GGMraw->GetListOfBranches()->Contains("channel15hv")) {
+        GGMraw->Draw("channel15hv>>histotemp");
+        hv = histotemp->GetMean();
+    }
+    title = "GGM CH15 low-range ";
+    if (hv>1) title = title + "(HV=" + std::to_string( hv ) + "V)";
+    imagesave = filel.replace(filel.find("_CH14l.pdf"), sizeof("_CH14l.pdf") - 1, "_CH15l.pdf");
+    h15l->SetTitle(title.c_str());
+    h15l->Draw();
+    c1->Print(imagesave.c_str());
+
+}
+
+void PrintConnectionStatus(int BHandle, bool info) {
+    switch (BHandle) {
+        case (0) :
+            if (info) printf("Connection is OK\n");
+            break;
+
+        default :
+            if (info) printf("Connection is NOT OK\n");
+            exit(-1);
+            break ;
+    }
+
+}
+
+void PrintStatusIRQ(int ret, bool info, std::string MessageSuccess, std::string MessageFailure) {
+    switch (ret) {
+        case cvSuccess   :
+            if (info) std::cout << "IRQ enabled " << MessageSuccess << std::endl;
+            break;
+
+        case cvBusError     :
+            if (info) std::cout << "Bus Error! " << MessageFailure << std::endl;
+            break;
+
+        case cvCommError :
+            if (info) std::cout << "Comunication Error! " << MessageFailure << std::endl;
+            break;
+
+        default          :
+            if (info) std::cout << "Unknown error, " <<  MessageFailure << std::endl;
+            break ;
+    }
+}
+
+void PrintStatus(int ret, bool info) {
+    switch (ret) {
+        case cvSuccess   :
+            break;
+
+        case cvBusError     :
+            if (info) printf("Bus Error!");
+            break;
+
+        case cvCommError :
+            if (info) printf("Comunication Error!");
+            break;
+
+        default          :
+            if (info) printf("Unknown error!");
+            break ;
+    }
+}

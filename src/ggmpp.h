@@ -42,13 +42,13 @@
     // Declaration C variables
     //char hex[34][8], hexx[8];
     char ch, buf[80]; // filel[100], filerun[100];
-    std::string filel, filedst;
+    std::string filel, filedst, command;
     //char bin[33], buf2[80];
     //char h2b[16][5]={"0000","0001","0010","0011","0100","0101","0110","0111","1000","1001","1010","1011","1100","1101","1110","1111"};
     //int number_of_channel, 
     //int event_buffer, starting = 0, 
     int Board;
-    int event = 1, rem = 0; // dec[14], eventmonitor;
+    int event = 1, rem = 0, rem2 = 0; // dec[14], eventmonitor, rateCheck;
     //int cost[23], dec_buff[24], 
     int gapPos[16];
     int BLTsize;
@@ -94,6 +94,8 @@ int highpedcharge0,highpedcharge1,highpedcharge2,highpedcharge3,highpedcharge4,h
     double chisquare0,chisquare1,chisquare2,chisquare3,chisquare4,chisquare5,chisquare6,chisquare7,chisquare8,chisquare9,chisquare10,chisquare11,chisquare12,chisquare13,chisquare14,chisquare15;
 
     long int unixtime;
+    time_t tempo1,tempo2;
+    double rate;
 
     FILE *p;
     std::string temporary="";

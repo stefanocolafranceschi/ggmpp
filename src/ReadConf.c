@@ -126,7 +126,7 @@ EOBHexPrint = false;
 HeaderHexPrint = false;
 }
     eventmonitor = reader.GetInteger("verbose", "EventMonitor", 100);  
-  
+    rateCheck = reader.GetInteger("daq", "rateCheck", 100);
     PrintHv = reader.GetBoolean("verbose", "PrintHv", true);
     PrintConfig = reader.GetBoolean("verbose", "PrintConfig", true);
     PrintDataFile = reader.GetBoolean("verbose", "PrintDataFile", true);

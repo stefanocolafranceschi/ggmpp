@@ -183,7 +183,7 @@ double** PrintHistograms(ReadConf myconfiguration, std::string filel) {
     for (range = start; range <= stop; range++) {           
         if (range==0) {
 	    htemp = new TH1F("htemp", "GGM raw", myconfiguration.HistoBinningH, myconfiguration.HistoMinH, myconfiguration.HistoMaxH);
-htemp2 = new TH1F("htemp2", "GGM raw", myconfiguration.HistoBinningH, myconfiguration.HistoMinH, myconfiguration.HistoMaxH);
+            htemp2 = new TH1F("htemp2", "GGM raw", myconfiguration.HistoBinningH, myconfiguration.HistoMinH, myconfiguration.HistoMaxH);
             htempsubtracted = new TH1F("htempsubtracted", "GGM raw", myconfiguration.HistoBinningH, myconfiguration.HistoMinH, myconfiguration.HistoMaxH);
             htempped = new TH1F("htempped", "GGM raw", myconfiguration.HistoBinningH, myconfiguration.HistoMinH, myconfiguration.HistoMaxH);
             hAvalanche = new TH1F("hAvalanche", "GGM raw", myconfiguration.FitLandauBins, myconfiguration.FitLandauMin,myconfiguration.FitLandauMax);
@@ -191,7 +191,7 @@ htemp2 = new TH1F("htemp2", "GGM raw", myconfiguration.HistoBinningH, myconfigur
 	    }
         if (range==1) {
             htemp = new TH1F("htemp", "GGM raw", myconfiguration.HistoBinningL, myconfiguration.HistoMinL, myconfiguration.HistoMaxL);
-htemp2 = new TH1F("htemp2", "GGM raw", myconfiguration.HistoBinningL, myconfiguration.HistoMinL, myconfiguration.HistoMaxL);
+            htemp2 = new TH1F("htemp2", "GGM raw", myconfiguration.HistoBinningL, myconfiguration.HistoMinL, myconfiguration.HistoMaxL);
             htempsubtracted = new TH1F("htempsubtracted", "GGM raw", myconfiguration.HistoBinningL, myconfiguration.HistoMinL, myconfiguration.HistoMaxL);
             htempped = new TH1F("htempped", "GGM raw", myconfiguration.HistoBinningL, myconfiguration.HistoMinL, myconfiguration.HistoMaxL);
             hAvalanche = new TH1F("hAvalanche", "GGM raw", 200, myconfiguration.FitLandauMin,myconfiguration.FitLandauMax);
@@ -286,8 +286,11 @@ htemp2 = new TH1F("htemp2", "GGM raw", myconfiguration.HistoBinningL, myconfigur
                 TString RangeSelector = "range==" + std::to_string(range);
                 GGMraw->Draw(Filter, RangeSelector);
                 htempsubtracted->Add(htempped,-1);
-                if (myconfiguration.ChargeADC=="SignalOnly") Results[5][i] = htempsubtracted->GetMean() - htempped->GetMean();
-                if (myconfiguration.ChargeADC=="MeanSubtraction") Results[5][i] = htemp->GetMean() - htempped->GetMean();
+                if (myconfiguration.ChargeADC=="SignalOnly") Results[5][i] = htempsubtracted->GetMean() - PedPosition;
+                if (myconfiguration.ChargeADC=="MeanSubtraction") {
+                    std::cout << "DEBUG histoMean = " << htemp->GetMean() << " PedMean = " << htempped->GetMean() << std::endl;
+                    Results[5][i] = htemp->GetMean() - PedPosition;
+                }
                 //std::cout << " RealPedPosition="<<RealPedPosition << " PedPos" << PedPosition << std::endl;
             }
 
@@ -326,8 +329,8 @@ htemp2 = new TH1F("htemp2", "GGM raw", myconfiguration.HistoBinningL, myconfigur
             // Performing fit
             if ( (myconfiguration.Fit) && (range == myconfiguration.FitRange) && (htemp->GetEntries() > 490) ) {
                 //std::cout << "GGM CH " + std::to_string(i) + " htemp entries = " <<  htemp->GetEntries() << std::endl;
-		        r1=-1;
-	            r2=-1;
+		r1=-1;
+	        r2=-1;
                 double integral1 = (double) htemp->Integral(htemp->FindBin(myconfiguration.FitLandauMin), htemp->FindBin(myconfiguration.FitLandauMax));
                    
                 if ( integral1 > myconfiguration.AvalancheThreshold ) {

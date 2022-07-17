@@ -2,7 +2,7 @@
 //  ggmpp.c
 //  
 //
-//  Created by Stefano Colafranceschi for the GGM++
+//  Created by Stefano Colafranceschi on 11/28/20.
 //
 #define _GLIBCXX_USE_C99 1
 #include "ReadConf.h"
@@ -409,12 +409,34 @@ bool FoundPed = true;
                         FoundPed = false;
                         event = event + 1;
                         rem = rem + 1;
+                        rem2 = rem2 + 1;
                         unixtime = static_cast<long int> (now);
+
+                        if ( event == 1 ) {
+                           time(&now);
+                           tempo1 = now;
+                        }
 
                         if (rem == myconfiguration.eventmonitor) {
                             if (myconfiguration.eventmonitor!=666) printf("\nEvent number: %d\n\n\n",(event-1) );
                             rem = 0;
                         }
+
+                        if (rem2 == myconfiguration.rateCheck) {
+                            // Rate
+                            time(&now);
+                            tempo2 = now;
+                            rate = ( tempo2 - tempo1 );
+                            time(&now);
+                            tempo1 = now;
+                            rate = myconfiguration.rateCheck / rate;
+                            
+                            //std::cout << " The measured rate is : " << rate << std::endl;
+                            command = myconfiguration.XDaqSendCommand + " " + myconfiguration.rpcmachine + ":rpc_ggm_trg0.rate:_original.._value " + std::to_string(rate) + " " + myconfiguration.psxmachine;
+                            system(command.c_str());
+                            rem2 = 0;
+                        }
+
                         //std::cout << man.data << std::endl;
 
                         // Rootfile filling
@@ -528,7 +550,6 @@ pedcharge15= lowpedcharge15;
                 // Reading the sensors
                 if (myconfiguration.arduinoEnable) {
                     arduino = ArduinoRead();
-//std::cout << "XXXX " << arduino[5] << std::endl;
 
                     pressureFromBefore = (arduino[0] + myconfiguration.arduinoOffset) / 32;
                     pressureToAfter = (arduino[1] + myconfiguration.arduinoOffset)/32;
@@ -538,27 +559,87 @@ pedcharge15= lowpedcharge15;
                     temperatureAmbient = ( (2000*(arduino[6]+ myconfiguration.arduinoOffset)) / (2500 - (arduino[6] + myconfiguration.arduinoOffset))-100)*2.6;
                     temperatureToFresh = ( (2000*(arduino[7]+ myconfiguration.arduinoOffset)) / (2500 - (arduino[7] + myconfiguration.arduinoOffset))-100)*2.6;
                     temperatureToBefore = ( (2000*(arduino[8]+ myconfiguration.arduinoOffset)) / (2500 - (arduino[8] + myconfiguration.arduinoOffset))-100)*2.6;
-//std::cout << "XXXX " << temperatureFromFresh << std::endl;
-//std::cout << "XXXX " << temperatureAmbient << std::endl;
-//std::cout << "XXXX " << temperatureToFresh << std::endl;
-//std::cout << "XXXX " << temperatureToBefore << std::endl;
 
-                    humidityToBefore = (arduino[9] + myconfiguration.arduinoOffset)/10;
-                    humidityAmbient = (arduino[11] + myconfiguration.arduinoOffset)/10;
-                    humidityFromFresh = (arduino[13] + myconfiguration.arduinoOffset)/10;
-                    humidityToFresh = (arduino[15] + myconfiguration.arduinoOffset)/10;
+                    humidityToBefore = 1.51*(arduino[9] + myconfiguration.arduinoOffset)/10-1;
+                    humidityAmbient = 1.51*(arduino[11] + myconfiguration.arduinoOffset)/10-1;
+                    humidityFromFresh = 1.51*(arduino[13] + myconfiguration.arduinoOffset)/10-1;
+                    humidityToFresh = 1.51*(arduino[15] + myconfiguration.arduinoOffset)/10-1;
 
        	       	    temperatureFromAfter = ( (2000*(arduino[0+16] + myconfiguration.arduinoOffset)) / (2500-(arduino[0+16]+ myconfiguration.arduinoOffset))-100)*2.6;
                     temperatureFromBefore = ( (2000*(arduino[1+16] + myconfiguration.arduinoOffset)) / (2500-(arduino[1+16]+ myconfiguration.arduinoOffset))-100)*2.6;
                     temperatureToAfter = ( (2000*(arduino[2+16] + myconfiguration.arduinoOffset)) / (2500-(arduino[2+16]+ myconfiguration.arduinoOffset))-100)*2.6;
-std::cout << "XXXX " << temperatureFromAfter << std::endl;
-std::cout << "XXXX " << temperatureFromBefore << std::endl;
-std::cout << "XXXX " << temperatureToAfter << std::endl;
 
                     pressureFromFresh = (arduino[4+16] + myconfiguration.arduinoOffset)/32;
                     pressureToBefore = (arduino[6+16] + myconfiguration.arduinoOffset)/32;
                     pressureToFresh = (arduino[8+16] + myconfiguration.arduinoOffset)/32;
                     pressureAmbient = 1000+(arduino[9+16] + myconfiguration.arduinoOffset)/32;
+
+                    command = myconfiguration.xdaqcommand + " " + myconfiguration.rpcmachine + ":Environmental_SGAtmoPressure.value:_online.._value " + myconfiguration.psxmachine + " | grep -oP '(?<=<psx:dp name=\"" + myconfiguration.rpcmachine + ":Environmental_SGAtmoPressure.value:_online.._value\">)[^<]*'";
+
+                    temporary = "";
+                    p = popen(command.c_str(),"r");
+                    while( (ch=fgetc(p)) != EOF)
+                    //putchar(ch);
+                    temporary = temporary + ch;
+                    pclose(p);
+                    //std::cout << temporary << std::endl;
+
+                    try {
+                        if (!temporary.empty()) {
+                            pressureAmbient = std::stod(temporary);
+                        }
+                        else {
+                            pressureAmbient = -1;
+                        }
+                    } catch (... ) {
+                       pressureAmbient=0;
+                       throw;
+                    }
+
+                    command = myconfiguration.xdaqcommand + " " + myconfiguration.rpcmachine + ":Environmental_SGAtmoPressure.value:_online.._value " + myconfiguration.psxmachine + " | grep -oP '(?<=<psx:dp name=\"" + myconfiguration.rpcmachine + ":Environmental_SGAtmoPressure.value:_online.._value\">)[^<]*'";
+
+                    temporary = "";
+                    p = popen(command.c_str(),"r");
+                    while( (ch=fgetc(p)) != EOF)
+                    //putchar(ch);
+                    temporary = temporary + ch;
+                    pclose(p);
+                    //std::cout << temporary << std::endl;
+
+                    try {
+                        if (!temporary.empty()) {
+                            pressureAmbient = std::stod(temporary);
+                        }
+                        else {
+                            pressureAmbient = -1;
+                        }
+                    } catch (... ) {
+                       pressureAmbient=0;
+                       throw;
+                    }
+
+                    command = myconfiguration.xdaqcommand + " " + myconfiguration.rpcmachine + ":Environmental_SGAtmoPressure.value:_online.._value " + myconfiguration.psxmachine + " | grep -oP '(?<=<psx:dp name=\"" + myconfiguration.rpcmachine + ":Environmental_SGAtmoPressure.value:_online.._value\">)[^<]*'";
+
+                    temporary = "";
+                    p = popen(command.c_str(),"r");
+                    while( (ch=fgetc(p)) != EOF)
+                    //putchar(ch);
+                    temporary = temporary + ch;
+                    pclose(p);
+                    //std::cout << temporary << std::endl;
+
+                    try {
+                        if (!temporary.empty()) {
+                            pressureAmbient = std::stod(temporary);
+                        }
+                        else {
+                            pressureAmbient = -1;
+                        }
+                    } catch (... ) {
+                       pressureAmbient=0;
+                       throw;
+                    }
+
 
                     humidityFromAfter = (arduino[11+16] + myconfiguration.arduinoOffset)/10;
                     humidityToAfter = (arduino[13+16] + myconfiguration.arduinoOffset)/10;

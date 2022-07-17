@@ -1,62 +1,102 @@
-{
+#include <cstdlib>
+#include <stdlib.h>
+#include <stdio.h>
+#include <math.h>
+#include <string.h>
+#include <stdarg.h>
+#include "CAENVMElib.h"
+#include <time.h>
+#include <iostream> 
+#include <fstream>
+#include "TString.h"
+#include "TCanvas.h"
+#include "TFile.h"
+#include "TStyle.h"
+#include "TLegend.h" 
+#include <TH2.h>
+#include <TTree.h>
+#include <TBranch.h>
+#include "TROOT.h"
+#include "TApplication.h"
+#include <TLorentzVector.h>        
+#include "TRint.h"
+#include "ReadConf.h"
+#include "monitor.h"
+
+
+int main() {
 //g++ -g -w -c -O -fbounds-check -pthread -std=c++11 -m64 -I/usr/include/root -ggdb -fPIC -DLINUX -Wall -O0  -I. -c monitor.c -o monitor.o #-std=c++0x
 //g++ -g -ggdb -Wall -s -O0 -o monitor monitor.o -l CAENVME -l curses -L/usr/lib64/root -lCore -lImt -lRIO -lNet -lHist -lGraf -lGraf3d -lGpad -lROOTDataFrame -lROOTVecOps -lTree -lTreePlayer -lRint -lPostscript -lMatrix -lPhysics -lMathCore -lThread -lMultiProc -pthread -lm -ldl -rdynamic -L/usr/lib64/root -lGui -lCore -lImt -lRIO -lNet -lHist -lGraf -lGraf3d -lGpad -lROOTDataFrame -lROOTVecOps -lTree -lTreePlayer -lRint -lPostscript -lMatrix -lPhysics -lMathCore -lThread -lMultiProc -pthread -lm -ldl -rdynamic
-   // Setting plots range and style
-   int temp_bin=200;
-   int temp_min=15;
-   int temp_max=25;
-
-   int p_bin=200;
-   int p_min=920;
-   int p_max=980;
-
-   int rh_bin=200;
-   int rh_min=-5;
-   int rh_max=65;
-
-   int histo_bin=200;
-   int histo_min=0;
-   int histo_max=10000;
-
-   int eff_bin=200;
-   float eff_min=0;
-   float eff_max=100;
-
-   int charge_bin=200;
-   float charge_min=0;
-   float charge_max=500;
-
-   int avalanche_bin=200;
-   float avalanche_min=0;
-   float avalanche_max=1000;
-
-   int streamer_bin=200;
-   float streamer_min=0;
-   float streamer_max=1000;
-
-   float label_font=0.025;
-   float axis_offset=0.9;
-   float time_bin=5;
-   float label_size=0.03;
-   float ref;
-
-   //////////
-   float wp_min=0;
-   float wp_max=1.8;
-   int wp_bin=200; 
-   int std_ref=2;
-   int unixtime_bin=100;
                 
    time_t now;
    struct tm  ts;
    time(&now);
-                
+       
    ts = *localtime(&now);
    int finish = (int)static_cast<long int> (now);
-   int start= (int)finish-604800;
+   int start= (int)finish-timeperiod;
 
+
+   ReadConf myconfiguration;
+   myconfiguration.InputFile = configFileM;
+   myconfiguration.LoadConfiguration();
+
+   // Reading the configuration file
+   temp_bin = myconfiguration.temp_bin;
+   temp_min = myconfiguration.temp_min;
+   temp_max = myconfiguration.temp_max;
+
+   p_bin =  myconfiguration.p_bin;
+   p_min =  myconfiguration.p_min;
+   p_max =  myconfiguration.p_max;
+
+   rh_bin =  myconfiguration.rh_bin;
+   rh_min =  myconfiguration.rh_min;
+   rh_max =  myconfiguration.rh_max;
+
+   hv_bin = myconfiguration.hv_bin;
+   hv_min = myconfiguration.hv_min;
+   hv_max = myconfiguration.hv_max;
+
+   histo_bin = myconfiguration.histo_bin;
+   histo_min = myconfiguration.histo_min;
+   histo_max = myconfiguration.histo_max;
+
+   eff_bin = myconfiguration.eff_bin;
+   eff_min = myconfiguration.eff_min;
+   eff_max = myconfiguration.eff_max;
+
+   charge_bin = myconfiguration.charge_bin;
+   charge_min = myconfiguration.charge_min;
+   charge_max = myconfiguration.charge_max;
+
+   chargeMin = myconfiguration.chargeMin;
+   chargeMax = myconfiguration.chargeMax;
+
+   avalanche_bin = myconfiguration.avalanche_bin;
+   avalanche_min = myconfiguration.avalanche_min;
+   avalanche_max = myconfiguration.avalanche_max;
+
+   streamer_bin = myconfiguration.streamer_bin;
+   streamer_min = myconfiguration.streamer_min;
+   streamer_max = myconfiguration.streamer_max;
+
+   label_font = myconfiguration.label_font;
+   axis_offset = myconfiguration.axis_offset;
+   time_bin = myconfiguration.time_bin;
+
+   label_size = myconfiguration.label_size;
+   wp_min = myconfiguration.wp_min;
+   wp_max = myconfiguration.wp_max;
+   wp_bin = myconfiguration.wp_bin;
+   std_ref = myconfiguration.ReferenceGap;
+   unixtime_bin = myconfiguration.unixtime_bin;
+   timeperiod = myconfiguration.timeperiod;
+
+
+//std::cout << "start is " << start << std::endl;
    gStyle->SetMarkerSize(1);
-   gStyle->SetMarkerStyle(20);
+   gStyle->SetMarkerStyle(kFullSquare);
    gStyle->SetMarkerColor(0);
    gStyle->SetOptStat(0);
 
@@ -74,6 +114,7 @@
    Float_t           Refficiency2, Refficiency3, Refficiency4, Refficiency5, Refficiency6, Refficiency7, Refficiency8, Refficiency9;
    Float_t           Rcharge2, Rcharge3, Rcharge4, Rcharge5, Rcharge6, Rcharge7, Rcharge8, Rcharge9;
    Float_t           Rchisquare2, Rchisquare3, Rchisquare4, Rchisquare5, Rchisquare6, Rchisquare7, Rchisquare8, Rchisquare9;
+   Float_t           Rhv2, Rhv3, Rhv4, Rhv5, Rhv6, Rhv7, Rhv8, Rhv9;
 
    // Opening the summary file
    std::ifstream InFile;
@@ -84,7 +125,7 @@
 
    // Tree and Branch definitions
    TTree *GGMDST = new TTree("GGMDST","GGMDST");
-   GGMDST->Branch("unixtime",&unixtime,"unixtime/F");
+   GGMDST->Branch("unixtime",&unixtime,"unixtime/I");
    GGMDST->Branch("avalanche2",&Ravalanche2,"Ravalanche2/F");
    GGMDST->Branch("avalanche3",&Ravalanche3,"Ravalanche3/F");
    GGMDST->Branch("avalanche4",&Ravalanche4,"Ravalanche4/F");
@@ -125,16 +166,179 @@
    GGMDST->Branch("chisquare7",&Rchisquare7,"Rchisquare7/F");
    GGMDST->Branch("chisquare8",&Rchisquare8,"Rchisquare8/F");
    GGMDST->Branch("chisquare9",&Rchisquare9,"Rchisquare9/F");
+   GGMDST->Branch("Rhv2",&Rhv2,"Rhv2/F");
+   GGMDST->Branch("Rhv3",&Rhv3,"Rhv3/F");
+   GGMDST->Branch("Rhv4",&Rhv4,"Rhv4/F");
+   GGMDST->Branch("Rhv5",&Rhv5,"Rhv5/F");
+   GGMDST->Branch("Rhv6",&Rhv6,"Rhv6/F");
+   GGMDST->Branch("Rhv7",&Rhv7,"Rhv7/F");
+   GGMDST->Branch("Rhv8",&Rhv8,"Rhv8/F");
+   GGMDST->Branch("Rhv9",&Rhv9,"Rhv9/F");
 
    // Scanning the dst file and filling the Tree
-   std::cout << " -- Reading the file " << std::endl;
-   while ( InFile >> unixtime >> Ravalanche2>> Ravalanche3>> Ravalanche4>> Ravalanche5>> Ravalanche6>> Ravalanche7>> Ravalanche8>> Ravalanche9>> Rstreamer2>> Rstreamer3>> Rstreamer4>> Rstreamer5>> Rstreamer6>> Rstreamer7>> Rstreamer8>> Rstreamer9>> Rcharge2>> Rcharge3>> Rcharge4>> Rcharge5>> Rcharge6>> Rcharge7>> Rcharge8>> Rcharge9>> Refficiency2>> Refficiency3>> Refficiency4>> Refficiency5>> Refficiency6>> Refficiency7>> Refficiency8>> Refficiency9>> Rchisquare2>> Rchisquare3>> Rchisquare4>> Rchisquare5>> Rchisquare6>> Rchisquare7>> Rchisquare8>> Rchisquare9) {
-      std::cout << " unixtime=" << unixtime << " " <<Ravalanche2<< " " << Ravalanche3 << std::endl;
-      GGMDST->Fill();
+   //std::cout << " -- Reading the file " << std::endl;
+   while ( InFile >> unixtime >> Ravalanche2>> Ravalanche3>> Ravalanche4>> Ravalanche5>> Ravalanche6>> Ravalanche7>> Ravalanche8>> Ravalanche9>> Rstreamer2>> Rstreamer3>> Rstreamer4>> Rstreamer5>> Rstreamer6>> Rstreamer7>> Rstreamer8>> Rstreamer9>> Rcharge2>> Rcharge3>> Rcharge4>> Rcharge5>> Rcharge6>> Rcharge7>> Rcharge8>> Rcharge9>> Refficiency2>> Refficiency3>> Refficiency4>> Refficiency5>> Refficiency6>> Refficiency7>> Refficiency8>> Refficiency9>> Rchisquare2>> Rchisquare3>> Rchisquare4>> Rchisquare5>> Rchisquare6>> Rchisquare7>> Rchisquare8>> Rchisquare9 >> Rhv2 >> Rhv3 >> Rhv4 >> Rhv5 >> Rhv6 >> Rhv7 >> Rhv8 >> Rhv9) {
+      //std::cout << " unixtime=" << unixtime << " " <<Ravalanche2<< " " << Ravalanche3 << std::endl;
+      if (unixtime>start) {
+          GGMDST->Fill();
+          //std::cout << " -->unixtime=" << unixtime << " " <<Ravalanche2<< " " << Rhv9 << std::endl;
+      }
    }
    //cout << " " << endl;
    GGMDST->Write();
 
+  ///////////////////////////////////
+   ////// * HV Plot*  //////
+   ///////////////////////////////////
+
+   TH2F *hv1 = new  TH2F("hv1","hv1",unixtime_bin,start,finish,hv_bin,hv_min,hv_max);
+   hv1->SetMarkerSize(0.7);
+   hv1->SetMarkerStyle(20);
+   hv1->SetMarkerColor(801);//797
+
+   TH2F *hv2 = new  TH2F("hv2","hv2",unixtime_bin,start,finish,hv_bin,hv_min,hv_max);
+   hv2->SetMarkerSize(0.7);
+   hv2->SetMarkerStyle(20);
+   hv2->SetMarkerColor(600);//600
+
+   TH2F *hv3 = new  TH2F("hv3","hv3",unixtime_bin,start,finish,hv_bin,hv_min,hv_max);
+   hv3->SetMarkerSize(0.7);
+   hv3->SetMarkerStyle(20);
+   hv3->SetMarkerColor(416);//812
+
+   TH2F *hv4 = new  TH2F("hv4","hv4",unixtime_bin,start,finish,hv_bin,hv_min,hv_max);
+   hv4->SetMarkerSize(0.7);
+   hv4->SetMarkerStyle(20);
+   hv4->SetMarkerColor(922);//904
+
+   TH2F *hv5 = new  TH2F("hv5","hv5",unixtime_bin,start,finish,hv_bin,hv_min,hv_max);
+   hv5->SetMarkerSize(0.7);
+   hv5->SetMarkerStyle(20);
+   hv5->SetMarkerColor(435);//867
+
+   TH2F *hv6 = new  TH2F("hv6","hv6",unixtime_bin,start,finish,hv_bin,hv_min,hv_max);
+   hv6->SetMarkerSize(0.7);
+   hv6->SetMarkerStyle(20);
+   hv6->SetMarkerColor(632);//632
+
+   TH2F *hv7 = new  TH2F("hv7","hv7",unixtime_bin,start,finish,hv_bin,hv_min,hv_max);
+   hv7->SetMarkerSize(0.7);
+   hv7->SetMarkerStyle(20);
+   hv7->SetMarkerColor(901);//803
+
+   TH2F *hv8 = new  TH2F("hv8","hv8",unixtime_bin,start,finish,hv_bin,hv_min,hv_max);
+   hv8->SetMarkerSize(0.7);
+   hv8->SetMarkerStyle(20);
+   hv8->SetMarkerColor(1);
+
+
+   TCanvas *Chambers_AQ = new TCanvas("Chambers_AQ","GGM Sys Chambers HV",0,0,1500,900);
+   TH2F *frame = new  TH2F("frame","frame",unixtime_bin,start,finish,hv_bin,hv_min,hv_max);
+   frame->SetTitle("GGM System HV");
+   frame->GetXaxis()->SetTitleOffset(axis_offset);
+   frame->GetXaxis()->SetTimeDisplay(1);
+   frame->GetXaxis()->SetTimeFormat("%Y %m %d %H:%M %F 1970-01-01 00:00:00");
+   frame->GetXaxis()->SetNdivisions(time_bin);
+   frame->GetXaxis()->SetLabelSize(label_size);
+   frame->GetXaxis()->SetTitle("time");
+   frame->GetYaxis()->SetTitleOffset(axis_offset);
+   frame->GetYaxis()->SetLabelSize(label_size);
+   frame->GetYaxis()->SetTitle("HV [V]");
+   gPad->SetGrid();
+
+   GGMDST->Draw("Rhv2:unixtime>>hv1","","same");
+   GGMDST->Draw("Rhv3:unixtime>>hv2","","same");
+   GGMDST->Draw("Rhv4:unixtime>>hv3","","same");
+   GGMDST->Draw("Rhv5:unixtime>>hv4","","same");
+   GGMDST->Draw("Rhv6:unixtime>>hv5","","same");
+   GGMDST->Draw("Rhv7:unixtime>>hv6","","same");
+   GGMDST->Draw("Rhv8:unixtime>>hv7","","same");
+   GGMDST->Draw("Rhv9:unixtime>>hv8","","same");
+
+   frame->Draw();
+   hv1->Draw("same");
+   hv2->Draw("same");
+   hv3->Draw("same");
+   hv4->Draw("same");
+   hv5->Draw("same");
+   hv6->Draw("same");
+   hv7->Draw("same");
+   hv8->Draw("same");
+
+   x1=0.9,y1=0.4,x2=x1+0.07,y2=y1+0.03;
+   TLegend *leg1=new TLegend(x1,y1,x2,y2);
+   leg1->AddEntry(frame,"Q ch2","p");
+   leg1->SetTextColor(1);
+   leg1->SetFillColor(797);
+   leg1->SetTextSize(label_font);
+   leg1->Draw();
+   y2=y2-0.04;
+   y1=y1-0.04;
+ 
+   TLegend *leg2=new TLegend(x1,y1,x2,y2);
+   leg2->AddEntry(frame,"Q ch3","p");
+   leg2->SetTextColor(0);
+   leg2->SetFillColor(600);
+   leg2->SetTextSize(label_font);
+   leg2->Draw();
+   y2=y2-0.04;
+   y1=y1-0.04;
+   
+   TLegend *leg3=new TLegend(x1,y1,x2,y2);
+   leg3->AddEntry(frame,"Q ch4","p");
+   leg3->SetTextColor(0);
+   leg3->SetFillColor(812);
+   leg3->SetTextSize(label_font);
+   leg3->Draw();
+   y2=y2-0.04;
+   y1=y1-0.04;
+
+   TLegend *leg4=new TLegend(x1,y1,x2,y2);
+   leg4->AddEntry(frame,"Q ch5","p");
+   leg4->SetTextColor(0);
+   leg4->SetFillColor(904);
+   leg4->SetTextSize(label_font);
+   leg4->Draw();
+   y2=y2-0.04;
+   y1=y1-0.04;
+
+   TLegend *leg5=new TLegend(x1,y1,x2,y2);
+   leg5->AddEntry(frame,"Q ch6","p");
+   leg5->SetTextColor(0);
+   leg5->SetFillColor(867);
+   leg5->SetTextSize(label_font);
+   leg5->Draw();
+   y2=y2-0.04;
+   y1=y1-0.04;
+
+   TLegend *leg6=new TLegend(x1,y1,x2,y2);
+   leg6->AddEntry(frame,"Q ch7","p");
+   leg6->SetTextColor(0);
+   leg6->SetFillColor(632);
+   leg6->SetTextSize(label_font);
+   leg6->Draw();
+   y2=y2-0.04;
+   y1=y1-0.04;
+
+   TLegend *leg7=new TLegend(x1,y1,x2,y2);
+   leg7->AddEntry(frame,"Q ch8","p");
+   leg7->SetTextColor(0);
+   leg7->SetFillColor(803);
+   leg7->SetTextSize(label_font);
+   leg7->Draw();
+   y2=y2-0.04;
+   y1=y1-0.04;
+
+   TLegend *leg8=new TLegend(x1,y1,x2,y2);
+   leg8->AddEntry(frame,"Q ch9","p");
+   leg8->SetTextColor(0);
+   leg8->SetFillColor(1);
+   leg8->SetTextSize(label_font);
+   leg8->Draw();
+   y2=y2-0.04;
+   y1=y1-0.04;
+
+   Chambers_AQ->Print("/ggmdata/DATA/hv.pdf");
 
    ///////////////////////////////////
    ////// *Anodic Charge Plot*  //////
@@ -181,8 +385,8 @@
    charge8->SetMarkerColor(1);
    
 
-   TCanvas *Chambers_AQ = new TCanvas("Chambers_AQ","GGM Sys Chambers Anodic Charge",0,0,1500,900);
-   TH2F *frame = new  TH2F("frame","frame",unixtime_bin,start,finish,charge_bin,charge_min,charge_max);  
+   Chambers_AQ = new TCanvas("Chambers_AQ","GGM Sys Chambers Anodic Charge",0,0,1500,900);
+   frame = new  TH2F("frame","frame",unixtime_bin,start,finish,charge_bin,charge_min,charge_max);  
    frame->SetTitle("GGM System Anodic Charge");
    frame->GetXaxis()->SetTitleOffset(axis_offset);
    frame->GetXaxis()->SetTimeDisplay(1); 
@@ -192,7 +396,7 @@
    frame->GetXaxis()->SetTitle("time");
    frame->GetYaxis()->SetTitleOffset(axis_offset);
    frame->GetYaxis()->SetLabelSize(label_size);
-   frame->GetYaxis()->SetTitle("Charge [pC]");
+   frame->GetYaxis()->SetTitle("Charge [ ADC channel ] (25fC/ch)");
    gPad->SetGrid();
 
    GGMDST->Draw("charge2:unixtime>>charge1","","same");
@@ -213,10 +417,10 @@
    charge6->Draw("same");
    charge7->Draw("same");
    charge8->Draw("same");
-/*
+
    x1=0.9,y1=0.4,x2=x1+0.07,y2=y1+0.03;
-   TLegend *leg1=new TLegend(x1,y1,x2,y2);
-   leg1->AddEntry(frame,"Q ch1","p");
+   leg1=new TLegend(x1,y1,x2,y2);
+   leg1->AddEntry(frame,"Q ch2","p");
    leg1->SetTextColor(1);
    leg1->SetFillColor(797);
    leg1->SetTextSize(label_font);
@@ -224,8 +428,8 @@
    y2=y2-0.04;
    y1=y1-0.04;
  
-   TLegend *leg2=new TLegend(x1,y1,x2,y2);
-   leg2->AddEntry(frame,"Q ch2","p");
+   leg2=new TLegend(x1,y1,x2,y2);
+   leg2->AddEntry(frame,"Q ch3","p");
    leg2->SetTextColor(0);
    leg2->SetFillColor(600);
    leg2->SetTextSize(label_font);
@@ -233,8 +437,8 @@
    y2=y2-0.04;
    y1=y1-0.04;
    
-   TLegend *leg3=new TLegend(x1,y1,x2,y2);
-   leg3->AddEntry(frame,"Q ch3","p");
+   leg3=new TLegend(x1,y1,x2,y2);
+   leg3->AddEntry(frame,"Q ch4","p");
    leg3->SetTextColor(0);
    leg3->SetFillColor(812);
    leg3->SetTextSize(label_font);
@@ -242,8 +446,8 @@
    y2=y2-0.04;
    y1=y1-0.04;
    
-   TLegend *leg4=new TLegend(x1,y1,x2,y2);
-   leg4->AddEntry(frame,"Q ch4","p");
+   leg4=new TLegend(x1,y1,x2,y2);
+   leg4->AddEntry(frame,"Q ch5","p");
    leg4->SetTextColor(0);
    leg4->SetFillColor(904);
    leg4->SetTextSize(label_font);
@@ -251,8 +455,8 @@
    y2=y2-0.04;
    y1=y1-0.04;
    
-   TLegend *leg5=new TLegend(x1,y1,x2,y2);
-   leg5->AddEntry(frame,"Q ch5","p");
+   leg5=new TLegend(x1,y1,x2,y2);
+   leg5->AddEntry(frame,"Q ch6","p");
    leg5->SetTextColor(0);
    leg5->SetFillColor(867);
    leg5->SetTextSize(label_font);
@@ -260,8 +464,8 @@
    y2=y2-0.04;
    y1=y1-0.04;
 
-   TLegend *leg6=new TLegend(x1,y1,x2,y2);
-   leg6->AddEntry(frame,"Q ch6","p");
+   leg6=new TLegend(x1,y1,x2,y2);
+   leg6->AddEntry(frame,"Q ch7","p");
    leg6->SetTextColor(0);
    leg6->SetFillColor(632);
    leg6->SetTextSize(label_font);
@@ -269,8 +473,8 @@
    y2=y2-0.04;
    y1=y1-0.04;
 
-   TLegend *leg7=new TLegend(x1,y1,x2,y2);
-   leg7->AddEntry(frame,"Q ch7","p");
+   leg7=new TLegend(x1,y1,x2,y2);
+   leg7->AddEntry(frame,"Q ch8","p");
    leg7->SetTextColor(0);
    leg7->SetFillColor(803);
    leg7->SetTextSize(label_font);
@@ -278,65 +482,64 @@
    y2=y2-0.04;
    y1=y1-0.04;
 
-   TLegend *leg8=new TLegend(x1,y1,x2,y2);
-   leg8->AddEntry(frame,"Q ch8","p");
+   leg8=new TLegend(x1,y1,x2,y2);
+   leg8->AddEntry(frame,"Q ch9","p");
    leg8->SetTextColor(0);
    leg8->SetFillColor(1);
    leg8->SetTextSize(label_font);
    leg8->Draw();
    y2=y2-0.04;
    y1=y1-0.04;
-*/
+
    Chambers_AQ->Print("/ggmdata/DATA/charge.pdf");
 
    ///////////////////////////////////
    ////// *Anodic Charge Plot (Ratio)*  //////
    ///////////////////////////////////
-
-   TH2F *rcharge1 = new  TH2F("rcharge1","rcharge1",unixtime_bin,start,finish,charge_bin,charge_min,charge_max);
+   TH2F *rcharge1 = new  TH2F("rcharge1","rcharge1",unixtime_bin,start,finish,charge_bin,chargeMin,chargeMax);
    rcharge1->SetMarkerSize(0.7);
    rcharge1->SetMarkerStyle(20);
    rcharge1->SetMarkerColor(801);//797
 
-   TH2F *rcharge2 = new  TH2F("rcharge2","rcharge2",unixtime_bin,start,finish,charge_bin,charge_min,charge_max);
+   TH2F *rcharge2 = new  TH2F("rcharge2","rcharge2",unixtime_bin,start,finish,charge_bin,chargeMin,chargeMax);
    rcharge2->SetMarkerSize(0.7);
    rcharge2->SetMarkerStyle(20);
    rcharge2->SetMarkerColor(600);//600
 
-   TH2F *rcharge3 = new  TH2F("rcharge3","rcharge3",unixtime_bin,start,finish,charge_bin,charge_min,charge_max);
+   TH2F *rcharge3 = new  TH2F("rcharge3","rcharge3",unixtime_bin,start,finish,charge_bin,chargeMin,chargeMax);
    rcharge3->SetMarkerSize(0.7);
    rcharge3->SetMarkerStyle(20);
    rcharge3->SetMarkerColor(416);//812
 
-   TH2F *rcharge4 = new  TH2F("rcharge4","rcharge4",unixtime_bin,start,finish,charge_bin,charge_min,charge_max);
+   TH2F *rcharge4 = new  TH2F("rcharge4","rcharge4",unixtime_bin,start,finish,charge_bin,chargeMin,chargeMax);
    rcharge4->SetMarkerSize(0.7);
    rcharge4->SetMarkerStyle(20);
    rcharge4->SetMarkerColor(922);//904
 
-   TH2F *rcharge5 = new  TH2F("rcharge5","rcharge5",unixtime_bin,start,finish,charge_bin,charge_min,charge_max);
+   TH2F *rcharge5 = new  TH2F("rcharge5","rcharge5",unixtime_bin,start,finish,charge_bin,chargeMin,chargeMax);
    rcharge5->SetMarkerSize(0.7);
    rcharge5->SetMarkerStyle(20);
    rcharge5->SetMarkerColor(435);//867
-   
-   TH2F *rcharge6 = new  TH2F("rcharge6","rcharge6",unixtime_bin,start,finish,charge_bin,charge_min,charge_max);
+
+   TH2F *rcharge6 = new  TH2F("rcharge6","rcharge6",unixtime_bin,start,finish,charge_bin,chargeMin,chargeMax);
    rcharge6->SetMarkerSize(0.7);
    rcharge6->SetMarkerStyle(20);
    rcharge6->SetMarkerColor(632);//632
 
-   TH2F *rcharge7 = new  TH2F("rcharge7","rcharge7",unixtime_bin,start,finish,charge_bin,charge_min,charge_max);
+   TH2F *rcharge7 = new  TH2F("rcharge7","rcharge7",unixtime_bin,start,finish,charge_bin,chargeMin,chargeMax);
    rcharge7->SetMarkerSize(0.7);
    rcharge7->SetMarkerStyle(20);
    rcharge7->SetMarkerColor(901);//803
-  
-   TH2F *rcharge8 = new  TH2F("rcharge8","rcharge8",unixtime_bin,start,finish,charge_bin,charge_min,charge_max);
+
+   TH2F *rcharge8 = new  TH2F("rcharge8","rcharge8",unixtime_bin,start,finish,charge_bin,chargeMin,chargeMax);
    rcharge8->SetMarkerSize(0.7);
    rcharge8->SetMarkerStyle(20);
    rcharge8->SetMarkerColor(1);
-   
 
-   TCanvas *Chambers_AQ2 = new TCanvas("Chambers_AQ2","GGM Sys Chambers Anodic Charge",0,0,1500,900);
-   TH2F *rframe2 = new  TH2F("rframe2","rframe2",unixtime_bin,start,finish,100,0.5,1.5);
-   rframe2->SetTitle("GGM System Anodic Charge");
+
+   TCanvas *Chambers_AQ2 = new TCanvas("Chambers_AQ2","GGM Sys Chambers Anodic Charge Ratios",0,0,1500,900);
+   TH2F *rframe2 = new  TH2F("rframe2","rframe2",unixtime_bin,start,finish,charge_bin,chargeMin,chargeMax);
+   rframe2->SetTitle("GGM System Anodic Charge (Ratio)");
    rframe2->GetXaxis()->SetTitleOffset(axis_offset);
    rframe2->GetXaxis()->SetTimeDisplay(1);
    rframe2->GetXaxis()->SetTimeFormat("%Y %m %d %H:%M %F 1970-01-01 00:00:00");
@@ -345,33 +548,120 @@
    rframe2->GetXaxis()->SetTitle("time");
    rframe2->GetYaxis()->SetTitleOffset(axis_offset);
    rframe2->GetYaxis()->SetLabelSize(label_size);
-   rframe2->GetYaxis()->SetTitle("Charge [pC]");
+   rframe2->GetYaxis()->SetTitle("Normalized Charge");
    gPad->SetGrid();
 
    //GGMDST->Draw("charge2:unixtime>>charge1","","same");
    //GGMDST->Draw("charge3:unixtime>>charge2","","same");
-   GGMDST->Draw("(charge4:unixtime)/charge2>>rcharge4","","same");
-   GGMDST->Draw("(charge5:unixtime)/charge2>>rcharge5","","same");
-   GGMDST->Draw("(charge6:unixtime)/charge2>>rcharge6","","same");
-   GGMDST->Draw("(charge7:unixtime)/charge2>>rcharge7","","same");
-   GGMDST->Draw("(charge8:unixtime)/charge2>>rcharge8","","same");
-   GGMDST->Draw("(charge9:unixtime)/charge2>>rcharge9","","same");
+   TString RatioPlot1 = "charge2/charge" + std::to_string(std_ref) + ":unixtime>>rcharge1";
+   TString RatioPlot2 = "charge3/charge" + std::to_string(std_ref) + ":unixtime>>rcharge2";
+   TString RatioPlot3 = "charge4/charge" + std::to_string(std_ref) + ":unixtime>>rcharge3";
+   TString RatioPlot4 = "charge5/charge" + std::to_string(std_ref) + ":unixtime>>rcharge4";
+   TString RatioPlot5 = "charge6/charge" + std::to_string(std_ref) + ":unixtime>>rcharge5";
+   TString RatioPlot6 = "charge7/charge" + std::to_string(std_ref) + ":unixtime>>rcharge6";
+   TString RatioPlot7 = "charge8/charge" + std::to_string(std_ref) + ":unixtime>>rcharge7";
+   TString RatioPlot8 = "charge9/charge" + std::to_string(std_ref) + ":unixtime>>rcharge8";
 
-   frame2->Draw();
+   GGMDST->Draw(RatioPlot1,"","same");
+GGMDST->Draw(RatioPlot2,"","same");
+GGMDST->Draw(RatioPlot3,"","same");
+GGMDST->Draw(RatioPlot4,"","same");
+GGMDST->Draw(RatioPlot5,"","same");
+GGMDST->Draw(RatioPlot6,"","same");
+GGMDST->Draw(RatioPlot7,"","same");
+GGMDST->Draw(RatioPlot8,"","same");
+
+   rframe2->Draw();
    //charge1->Draw("same");
    //charge2->Draw("same");
    //charge3->Draw("same");
+   rcharge1->Draw("same");
+   rcharge2->Draw("same");
+   rcharge3->Draw("same");
    rcharge4->Draw("same");
    rcharge5->Draw("same");
    rcharge6->Draw("same");
    rcharge7->Draw("same");
    rcharge8->Draw("same");
-   rcharge9->Draw("same");
+
+   x1=0.9,y1=0.4,x2=x1+0.07,y2=y1+0.03;
+   leg1=new TLegend(x1,y1,x2,y2);
+   leg1->AddEntry(frame,"Q ch2","p");
+   leg1->SetTextColor(1);
+   leg1->SetFillColor(797);
+   leg1->SetTextSize(label_font);
+   leg1->Draw();
+   y2=y2-0.04;
+   y1=y1-0.04;
+
+   leg2=new TLegend(x1,y1,x2,y2);
+   leg2->AddEntry(frame,"Q ch3","p");
+   leg2->SetTextColor(0);
+   leg2->SetFillColor(600);
+   leg2->SetTextSize(label_font);
+   leg2->Draw();
+   y2=y2-0.04;
+   y1=y1-0.04;
+
+   leg3=new TLegend(x1,y1,x2,y2);
+   leg3->AddEntry(frame,"Q ch4","p");
+   leg3->SetTextColor(0);
+   leg3->SetFillColor(812);
+   leg3->SetTextSize(label_font);
+   leg3->Draw();
+   y2=y2-0.04;
+   y1=y1-0.04;
+
+   leg4=new TLegend(x1,y1,x2,y2);
+   leg4->AddEntry(frame,"Q ch5","p");
+   leg4->SetTextColor(0);
+   leg4->SetFillColor(904);
+   leg4->SetTextSize(label_font);
+   leg4->Draw();
+   y2=y2-0.04;
+   y1=y1-0.04;
+
+   leg5=new TLegend(x1,y1,x2,y2);
+   leg5->AddEntry(frame,"Q ch6","p");
+   leg5->SetTextColor(0);
+   leg5->SetFillColor(867);
+   leg5->SetTextSize(label_font);
+   leg5->Draw();
+   y2=y2-0.04;
+   y1=y1-0.04;
+
+   leg6=new TLegend(x1,y1,x2,y2);
+   leg6->AddEntry(frame,"Q ch7","p");
+   leg6->SetTextColor(0);
+   leg6->SetFillColor(632);
+   leg6->SetTextSize(label_font);
+   leg6->Draw();
+   y2=y2-0.04;
+   y1=y1-0.04;
+
+   leg7=new TLegend(x1,y1,x2,y2);
+   leg7->AddEntry(frame,"Q ch8","p");
+   leg7->SetTextColor(0);
+   leg7->SetFillColor(803);
+   leg7->SetTextSize(label_font);
+   leg7->Draw();
+   y2=y2-0.04;
+   y1=y1-0.04;
+
+   leg8=new TLegend(x1,y1,x2,y2);
+   leg8->AddEntry(frame,"Q ch9","p");
+   leg8->SetTextColor(0);
+   leg8->SetFillColor(1);
+   leg8->SetTextSize(label_font);
+   leg8->Draw();
+   y2=y2-0.04;
+   y1=y1-0.04;
+
    Chambers_AQ2->Print("/ggmdata/DATA/chargeRatio.pdf");
 
 
 
-/*
+
    ////////////////////////////////
    ////// *Efficiency plot*  //////
    ////////////////////////////////
@@ -453,7 +743,7 @@
 
    x1=0.9,y1=0.85,x2=x1+0.07,y2=y1+0.03;
    leg1=new TLegend(x1,y1,x2,y2);
-   leg1->AddEntry(eff_frame,"#varepsilon ch1","p");
+   leg1->AddEntry(eff_frame,"#varepsilon ch2","p");
    leg1->SetTextColor(1);
    leg1->SetFillColor(797);
    leg1->SetTextSize(label_font);
@@ -462,7 +752,7 @@
    y1=y1-0.04;
 
    leg2=new TLegend(x1,y1,x2,y2);
-   leg2->AddEntry(eff_frame,"#varepsilon ch2","p");
+   leg2->AddEntry(eff_frame,"#varepsilon ch3","p");
    leg2->SetTextColor(0);
    leg2->SetFillColor(600);
    leg2->SetTextSize(label_font);
@@ -471,7 +761,7 @@
    y1=y1-0.04;
    
    leg3=new TLegend(x1,y1,x2,y2);
-   leg3->AddEntry(eff_frame,"#varepsilon ch3","p");
+   leg3->AddEntry(eff_frame,"#varepsilon ch4","p");
    leg3->SetTextColor(0);
    leg3->SetFillColor(812);
    leg3->SetTextSize(label_font);
@@ -480,7 +770,7 @@
    y1=y1-0.04;
    
    leg4=new TLegend(x1,y1,x2,y2);
-   leg4->AddEntry(eff_frame,"#varepsilon ch4","p");
+   leg4->AddEntry(eff_frame,"#varepsilon ch5","p");
    leg4->SetTextColor(0);
    leg4->SetFillColor(904);
    leg4->SetTextSize(label_font);
@@ -489,7 +779,7 @@
    y1=y1-0.04;
    
    leg5=new TLegend(x1,y1,x2,y2);
-   leg5->AddEntry(eff_frame,"#varepsilon ch5","p");
+   leg5->AddEntry(eff_frame,"#varepsilon ch6","p");
    leg5->SetTextColor(0);//era test bin
    leg5->SetFillColor(867);
    leg5->SetTextSize(label_font);
@@ -498,7 +788,7 @@
    y1=y1-0.04;
 
    leg6=new TLegend(x1,y1,x2,y2);
-   leg6->AddEntry(eff_frame,"#varepsilon ch6","p");
+   leg6->AddEntry(eff_frame,"#varepsilon ch7","p");
    leg6->SetTextColor(0);
    leg6->SetFillColor(632);
    leg6->SetTextSize(label_font);
@@ -507,7 +797,7 @@
    y1=y1-0.04;
 
    leg7=new TLegend(x1,y1,x2,y2);
-   leg7->AddEntry(eff_frame,"#varepsilon ch7","p");
+   leg7->AddEntry(eff_frame,"#varepsilon ch8","p");
    leg7->SetTextColor(0);
    leg7->SetFillColor(803);
    leg7->SetTextSize(label_font);
@@ -516,7 +806,7 @@
    y1=y1-0.04;
 
    leg8=new TLegend(x1,y1,x2,y2);
-   leg8->AddEntry(eff_frame,"#varepsilon ch8","p");
+   leg8->AddEntry(eff_frame,"#varepsilon ch9","p");
    leg8->SetTextColor(0);
    leg8->SetFillColor(1);
    leg8->SetTextSize(label_font);
@@ -571,7 +861,7 @@
    avalanche8->SetMarkerColor(1);
    
 
-   Chambers_AQ = new TCanvas("Chambers_AQ","GGM Sys Chambers Anodic avalanche",0,0,1500,900);
+   Chambers_AQ = new TCanvas("Chambers_AQ","GGM Sys Chambers avalanche",0,0,1500,900);
    frame = new  TH2F("frame","frame",unixtime_bin,start,finish,avalanche_bin,avalanche_min,avalanche_max);  
    frame->SetTitle("GGM System Anodic avalanche");
    frame->GetXaxis()->SetTitleOffset(axis_offset);
@@ -606,7 +896,7 @@
 
    x1=0.9,y1=0.4,x2=x1+0.07,y2=y1+0.03;
    leg1=new TLegend(x1,y1,x2,y2);
-   leg1->AddEntry(frame,"Q ch1","p");
+   leg1->AddEntry(frame,"Q ch2","p");
    leg1->SetTextColor(1);
    leg1->SetFillColor(797);
    leg1->SetTextSize(label_font);
@@ -615,7 +905,7 @@
    y1=y1-0.04;
  
    leg2=new TLegend(x1,y1,x2,y2);
-   leg2->AddEntry(frame,"Q ch2","p");
+   leg2->AddEntry(frame,"Q ch3","p");
    leg2->SetTextColor(0);
    leg2->SetFillColor(600);
    leg2->SetTextSize(label_font);
@@ -624,7 +914,7 @@
    y1=y1-0.04;
    
    leg3=new TLegend(x1,y1,x2,y2);
-   leg3->AddEntry(frame,"Q ch3","p");
+   leg3->AddEntry(frame,"Q ch4","p");
    leg3->SetTextColor(0);
    leg3->SetFillColor(812);
    leg3->SetTextSize(label_font);
@@ -633,7 +923,7 @@
    y1=y1-0.04;
    
    leg4=new TLegend(x1,y1,x2,y2);
-   leg4->AddEntry(frame,"Q ch4","p");
+   leg4->AddEntry(frame,"Q ch5","p");
    leg4->SetTextColor(0);
    leg4->SetFillColor(904);
    leg4->SetTextSize(label_font);
@@ -642,7 +932,7 @@
    y1=y1-0.04;
    
    leg5=new TLegend(x1,y1,x2,y2);
-   leg5->AddEntry(frame,"Q ch5","p");
+   leg5->AddEntry(frame,"Q ch6","p");
    leg5->SetTextColor(0);
    leg5->SetFillColor(867);
    leg5->SetTextSize(label_font);
@@ -651,7 +941,7 @@
    y1=y1-0.04;
 
    leg6=new TLegend(x1,y1,x2,y2);
-   leg6->AddEntry(frame,"Q ch6","p");
+   leg6->AddEntry(frame,"Q ch7","p");
    leg6->SetTextColor(0);
    leg6->SetFillColor(632);
    leg6->SetTextSize(label_font);
@@ -660,7 +950,7 @@
    y1=y1-0.04;
 
    leg7=new TLegend(x1,y1,x2,y2);
-   leg7->AddEntry(frame,"Q ch7","p");
+   leg7->AddEntry(frame,"Q ch8","p");
    leg7->SetTextColor(0);
    leg7->SetFillColor(803);
    leg7->SetTextSize(label_font);
@@ -669,7 +959,7 @@
    y1=y1-0.04;
 
    leg8=new TLegend(x1,y1,x2,y2);
-   leg8->AddEntry(frame,"Q ch8","p");
+   leg8->AddEntry(frame,"Q ch9","p");
    leg8->SetTextColor(0);
    leg8->SetFillColor(1);
    leg8->SetTextSize(label_font);
@@ -724,7 +1014,7 @@
    streamer8->SetMarkerColor(1);
    
 
-   Chambers_AQ = new TCanvas("Chambers_AQ","GGM Sys Chambers Anodic streamer",0,0,1500,900);
+   Chambers_AQ = new TCanvas("Chambers_AQ","GGM Sys Chambers Streamer",0,0,1500,900);
    frame = new  TH2F("frame","frame",unixtime_bin,start,finish,streamer_bin,streamer_min,streamer_max);  
    frame->SetTitle("GGM System Anodic streamer");
    frame->GetXaxis()->SetTitleOffset(axis_offset);
@@ -759,7 +1049,7 @@
 
    x1=0.9,y1=0.4,x2=x1+0.07,y2=y1+0.03;
    leg1=new TLegend(x1,y1,x2,y2);
-   leg1->AddEntry(frame,"Q ch1","p");
+   leg1->AddEntry(frame,"Q ch2","p");
    leg1->SetTextColor(1);
    leg1->SetFillColor(797);
    leg1->SetTextSize(label_font);
@@ -768,7 +1058,7 @@
    y1=y1-0.04;
  
    leg2=new TLegend(x1,y1,x2,y2);
-   leg2->AddEntry(frame,"Q ch2","p");
+   leg2->AddEntry(frame,"Q ch3","p");
    leg2->SetTextColor(0);
    leg2->SetFillColor(600);
    leg2->SetTextSize(label_font);
@@ -777,7 +1067,7 @@
    y1=y1-0.04;
    
    leg3=new TLegend(x1,y1,x2,y2);
-   leg3->AddEntry(frame,"Q ch3","p");
+   leg3->AddEntry(frame,"Q ch4","p");
    leg3->SetTextColor(0);
    leg3->SetFillColor(812);
    leg3->SetTextSize(label_font);
@@ -786,7 +1076,7 @@
    y1=y1-0.04;
    
    leg4=new TLegend(x1,y1,x2,y2);
-   leg4->AddEntry(frame,"Q ch4","p");
+   leg4->AddEntry(frame,"Q ch5","p");
    leg4->SetTextColor(0);
    leg4->SetFillColor(904);
    leg4->SetTextSize(label_font);
@@ -795,7 +1085,7 @@
    y1=y1-0.04;
    
    leg5=new TLegend(x1,y1,x2,y2);
-   leg5->AddEntry(frame,"Q ch5","p");
+   leg5->AddEntry(frame,"Q ch6","p");
    leg5->SetTextColor(0);
    leg5->SetFillColor(867);
    leg5->SetTextSize(label_font);
@@ -804,7 +1094,7 @@
    y1=y1-0.04;
 
    leg6=new TLegend(x1,y1,x2,y2);
-   leg6->AddEntry(frame,"Q ch6","p");
+   leg6->AddEntry(frame,"Q ch7","p");
    leg6->SetTextColor(0);
    leg6->SetFillColor(632);
    leg6->SetTextSize(label_font);
@@ -813,7 +1103,7 @@
    y1=y1-0.04;
 
    leg7=new TLegend(x1,y1,x2,y2);
-   leg7->AddEntry(frame,"Q ch7","p");
+   leg7->AddEntry(frame,"Q ch8","p");
    leg7->SetTextColor(0);
    leg7->SetFillColor(803);
    leg7->SetTextSize(label_font);
@@ -822,7 +1112,7 @@
    y1=y1-0.04;
 
    leg8=new TLegend(x1,y1,x2,y2);
-   leg8->AddEntry(frame,"Q ch8","p");
+   leg8->AddEntry(frame,"Q ch9","p");
    leg8->SetTextColor(0);
    leg8->SetFillColor(1);
    leg8->SetTextSize(label_font);
@@ -1070,6 +1360,17 @@
     FrameXwp->Write();
     FramexTandP->Write();
     */
-system("mail -a /ggmdata/DATA/chargeRatio.pdf -a /ggmdata/DATA/efficiency.pdf -a /ggmdata/DATA/charge.pdf -a /ggmdata/DATA/avalanche.pdf -a /ggmdata/DATA/streamer.pdf -s \"Automatic Monitoring\" stefano.colafranceschi@cern.ch < /dev/null");
+    std::string dt;
+    dt.append(ctime(&now));
+    dt = "\"Automatic Monitoring ";
+    dt.append(ctime(&now));
+    dt.append("\" ");
+dt.erase(std::remove(dt.begin(), dt.end(), '\n'), dt.end());
+//std::cout << dt;
 
+    std::string command = "mail -a /ggmdata/DATA/chargeRatio.pdf -a /ggmdata/DATA/db.root -a /ggmdata/DATA/hv.pdf -a /ggmdata/DATA/efficiency.pdf -a /ggmdata/DATA/charge.pdf -a /ggmdata/DATA/avalanche.pdf -a /ggmdata/DATA/streamer.pdf -s " + dt + myconfiguration.email + " < /dev/null";
+//std::cout << command;
+    system(command.c_str());
+    //system("mail -a /ggmdata/DATA/chargeRatio.pdf -a /ggmdata/DATA/db.root -a /ggmdata/DATA/hv.pdf -a /ggmdata/DATA/efficiency.pdf -a /ggmdata/DATA/charge.pdf -a /ggmdata/DATA/avalanche.pdf -a /ggmdata/DATA/streamer.pdf -s \"Automatic Monitoring\" cmsfrascatiggm@googlegroups.com < /dev/null");
+//system("mail -a /ggmdata/DATA/db.root -a /ggmdata/DATA/hv.pdf -a /ggmdata/DATA/efficiency.pdf -a /ggmdata/DATA/charge.pdf -a /ggmdata/DATA/avalanche.pdf -a /ggmdata/DATA/streamer.pdf -s \"Automatic Monitoring\" stefano.colafranceschi@emu.edu < /dev/null");
 }
